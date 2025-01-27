@@ -1,0 +1,54 @@
+units metal
+dimension 3 
+boundary p p f
+atom_style atomic 
+
+read_data data.Cu_relax_again
+
+# Set pair style
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+# Coordinates of the target
+variable target_x equal 3.615 
+variable target_y equal 3.615 
+variable target_z equal 14.511332686472011  
+
+# Calculate the starting x- position for the sputtered atom
+# Give E (initial energy) and A (incident angle in rad) on command line 
+variable rad_a equal $A*PI/180  # Convert given angle to radians
+
+variable vel_in equal -(sqrt($E*2.0/63.55)*98.0855)  # Calculate total velocity from given energy
+variable vz equal ${vel_in}*cos(${rad_a})  # Calculate the z-component of the velocity
+variable vx equal ${vel_in}*sin(${rad_a})  # Calculate the x-component of the velocity
+
+# Set regions and groups
+region sputter block 10 15 10 15 20 25
+region bottom block INF INF INF INF -7.281332686472011 -5.281332686472011
+
+group sputter region sputter
+group bottom region bottom 
+
+# Set velocities for groups
+velocity all create 300.0 1234 dist gaussian
+velocity bottom create 0.0 1234 dist gaussian
+
+timestep 0.001
+
+# Calculate a seed for deposit, ensuring different results, set up bash rng to get different seed every time?
+variable rngseed equal 4321*$N+1
+
+# Set system to 300 K, freeze the bottom and sputter a single atom at target
+fix 1 all nvt temp 300.0 300.0 $(100*dt)
+fix 2 bottom setforce 0.0 0.0 0.0
+fix 3 sputter deposit 1 1 1000 ${rngseed} region sputter units box vx ${vx} ${vx} vz ${vz} ${vz}
+
+thermo_style custom step time temp pe etotal press vol atoms
+thermo_modify lost ignore flush yes
+thermo 100
+
+dump 10 all atom 15 Cu_sputter_loops/dump/sputter_loop_$N.dump
+
+run 3000
+
+write_data Cu_sputter_loops/data/data.sputter_loop_$N

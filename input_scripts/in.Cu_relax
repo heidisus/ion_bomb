@@ -1,0 +1,23 @@
+units metal 
+dimension 3 
+boundary p p p 
+atom_style atomic 
+
+# NPT relaxation of Cu system to 300 K
+
+read_data Cu_0K_small
+
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+velocity all create 300.0 1234 dist gaussian
+
+timestep 0.001
+fix 1 all npt temp 300.0 300.0 0.01 iso 0.0 0.0 1
+thermo_style custom step time temp pe etotal press vol
+
+thermo 10
+dump 2 all atom 10 Cu_relax.dump
+
+run 6000 
+
+write_data data.Cu_relaxed

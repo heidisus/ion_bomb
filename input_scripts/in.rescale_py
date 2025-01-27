@@ -1,0 +1,100 @@
+units metal
+dimension 3 
+boundary p p f
+atom_style atomic 
+
+atom_modify map yes
+read_data data/lammps_datafiles/data.Cu_28x28x17_300_nvt_relax
+
+# Simulation using Python interface to deal with velocity rescaling
+
+# Set length of the simulation in ps
+variable full_runtime equal 6
+
+# Set pair style
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+variable A equal 0  # Coded in for initial convenience 
+variable N equal 0  # Coded in for initial convenience 
+variable T equal 300  # Coded in for initial convenience 
+variable E equal 100  # Coded in for initial convenience 
+variable r equal 15  # Coded in for initial convenience 
+
+# Coordinates of the midpoint of the box
+variable middle_x equal 21.96785629365 # 3.615 
+variable middle_y equal 21.96785629365 # 3.615 
+variable middle_z equal 21.88428032605446 # 14.511332686472011  # NOTE: NOT the surface coordinate
+
+# Give E (initial energy) and A (incident angle in rad) on command line 
+variable rad_a equal $A*PI/180  # Convert given angle to radians
+
+variable vel_in equal -(sqrt($E*2.0/63.55)*98.0855)  # Calculate total velocity from given energy
+variable vz equal ${vel_in}*cos(${rad_a})  # Calculate the z-component of the velocity
+variable vx equal ${vel_in}*sin(${rad_a})  # Calculate the x-component of the velocity
+
+# Surface temperature
+variable target_t equal $T
+
+# Box coordinates
+variable xlo equal xlo
+variable xhi equal xhi
+variable ylo equal ylo
+variable yhi equal yhi
+variable zlo equal zlo
+variable zhi equal zhi
+variable cyl_bot equal 60
+variable cyl_top equal 65
+variable heat_top equal (${zhi}-45)
+variable heat_bot equal (${zhi}-70)
+
+# Set regions and groups
+region bottom block INF INF INF INF INF -25.8
+region surface block INF INF INF INF 15 38  # Region where the temperature is calculated
+# region sputter block -5 5 -5 5 50 55
+region sputter cylinder z 0.0 0.0 ${r} ${cyl_bot} ${cyl_top} units box 
+region top block INF INF INF INF 68 INF  # Region to slow the sputtered atoms
+
+group sputter region sputter
+group bottom region bottom 
+group top dynamic all region top
+group surface region surface 
+
+compute tsurf surface temp 
+
+# Set velocities for groups
+velocity all create ${target_t} 1234 dist gaussian
+velocity bottom create 0.0 1234 dist gaussian
+
+# Init the python function used to rescale the atoms
+python rescale input 1 SELF format p file pythonscripts/lammps_rescale.py
+
+variable timee equal time
+timestep 0.001
+# fix adt all dt/reset 1 NULL NULL 0.1 emax 30 units box
+# fix myhalt all halt 100 v_timee >= ${full_runtime} error continue
+
+# Calculate a seed for deposit, ensuring different results, set up bash rng to get different seed every time?
+variable rngseed equal 4321*$N+1
+
+# Set system to 300 K, freeze the bottom and heat the top
+fix 1 all nve 
+fix 2 bottom setforce 0.0 0.0 0.0
+fix damp top viscous 0.85
+fix pf all python/invoke 50 end_of_step rescale
+
+thermo_style custom step time temp pe etotal press vol atoms c_tsurf
+# thermo_modify lost ignore flush yes
+thermo 150
+
+run 1000
+
+unfix pf
+fix pf all python/invoke 200 end_of_step rescale
+fix 4 sputter deposit 1000 1 99 ${rngseed} region sputter units box vx ${vx} ${vx} vz ${vz} ${vz} target 0 0 30
+
+dump dmp all custom 10 scale_test.dump id type xs ys zs vx vy vz
+
+run 30000
+
+write_data data.scaletestdir

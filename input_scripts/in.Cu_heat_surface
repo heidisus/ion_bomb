@@ -1,0 +1,48 @@
+units metal
+dimension 3 
+boundary p p p
+atom_style atomic 
+
+read_data data.Cu_relaxed_bulk
+
+# Simulation to melt surface of simulation box
+
+# Set pair style
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+
+# Determine the temp that the surface should be heated to
+variable target_t equal 1358.0
+
+# Set regions and groups
+#region sputter block 10 15 10 15 20 25
+# region bottom block INF INF INF INF -7.281332686472011 -5.281332686472011
+# region surface block INF INF INF INF 12.511332686472011 14.511332686472011
+
+# group sputter region sputter
+
+# Set velocities for groups
+velocity all create 1358.0 1234 dist gaussian
+# velocity surface create 1358.0 1234 dist gaussian
+# velocity bottom create 0.0 1234 dist gaussian
+
+timestep 0.001
+
+# Calculate a seed for deposit, ensuring different results, set up bash rng to get different seed every time?
+# variable rngseed equal 4321*$N+1
+
+# Set system to target T, freeze the bottom and heat the top
+fix 1 all npt temp ${target_t} ${target_t} $(100*dt) iso 0.0 0.0 $(1000*dt)
+# fix 3 surface npt temp 1358.0 1358.0 $(100*dt)
+# fix 3 sputter deposit 1 1 1000 ${rngseed} region sputter units box vx ${vx} ${vx} vz ${vz} ${vz}
+
+thermo_style custom step time temp pe etotal press vol atoms
+# thermo_modify lost ignore flush yes
+thermo 100
+
+dump 10 all atom 15 Cu_heat_surf/dump/heatsurf.dump
+
+run 3000
+
+write_data Cu_heat_surf/data/data.heat_surface

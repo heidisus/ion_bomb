@@ -1,0 +1,59 @@
+units metal
+dimension 3 
+boundary p p f
+atom_style atomic 
+
+atom_modify map yes
+
+# Input script for the sputtering simulations, relaxed at npt and nvt
+
+# Surface temperature
+variable T equal 1358
+
+read_data data/lammps_datafiles/data.Cu_28x28x17_${T}_nvt_relax
+reset_atoms id
+
+# Set pair style
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+# Box coordinates
+variable xlo equal xlo
+variable xhi equal xhi
+variable ylo equal ylo
+variable yhi equal yhi
+variable zlo equal zlo
+variable zhi equal zhi
+variable new_zlo equal (${zlo}-20)
+variable new_zhi equal (${zhi}+50)
+
+change_box all z final ${new_zlo} ${new_zhi} boundary p p f units box
+
+variable area equal ((v_xhi-v_xlo)*(v_yhi-v_ylo)/100)   # Surface area in nm^2
+
+# Set regions and groups
+region bottom block INF INF INF INF INF -25.8
+region surface block INF INF INF INF 15 50              # Region where the temperature is calculated
+region sputter block ${xlo} ${xhi} ${ylo} ${yhi} 85 90
+# region sputter z 0.0 0.0 30 25 35 units box             # Region to sputter only over the crater
+
+group bottom region bottom 
+group surface region surface 
+group sputter region sputter
+
+variable inserted_atoms equal 0
+compute tsurf surface temp 
+
+# Set velocities for groups
+velocity all create $T 1234 dist gaussian
+velocity bottom set 0 0 0
+
+# Set system to nve, set the bottom momentum to 0
+fix 1 all nve
+fix 2 bottom momentum 1 linear 1 1 1 angular
+
+thermo_style custom step time temp pe etotal press vol atoms c_tsurf v_inserted_atoms
+thermo_modify lost ignore flush yes  # Allow atoms to leave the box
+thermo 100
+
+dump dmp all custom 10 rainpytest_$T.dump id type xs ys zs vx vy vz

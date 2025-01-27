@@ -1,0 +1,76 @@
+units metal 
+dimension 3 
+boundary p p p 
+atom_style atomic 
+
+# NPT relaxation of Cu system to selected temperature
+
+read_data data/Cu_0K_95x95x42
+
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+# variable T equal 1000  # uncomment if the temp is not given from the cmd line
+velocity all create ${T} 1354657 dist gaussian
+
+timestep 0.001
+fix 1 all npt temp ${T} ${T} $(100*dt) iso 0.0 0.0 $(1000*dt)
+thermo_style custom step time temp pe etotal press vol
+
+thermo 100
+# dump 2 all atom 10 Cu_95x95x48_${T}_npt_relax.dump
+
+run 3000
+
+write_data data/data.Cu_95x95x42_${T}_npt_relax
+
+unfix 1
+
+print "Beginning NVT"
+
+# ----------------------------------------------------------------------
+# NVT relaxation of Cu system to selected temperature
+# ----------------------------------------------------------------------
+
+
+# Box coordinates
+variable xlo equal xlo
+variable xhi equal xhi
+variable ylo equal ylo
+variable yhi equal yhi
+variable zlo equal zlo
+variable zhi equal zhi
+variable frozen_coord equal (${zlo}+10)
+variable new_zlo equal (${zlo}-50)
+variable new_zhi equal (${zhi}+250)
+
+# Set new box
+change_box all z final ${new_zlo} ${new_zhi} boundary p p f units box
+
+# Set pair style
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+# Set regions and groups
+region bottom block INF INF INF INF INF ${frozen_coord}
+
+group bottom region bottom 
+
+# Set velocities for groups
+velocity all create ${T} 1324652 dist gaussian
+velocity bottom set 0 0 0
+timestep 0.001
+
+# Set system to nvt, set the bottom momentum to 0
+fix 1 all nvt temp ${T} ${T} $(100*dt)
+fix 2 bottom momentum 1 linear 1 1 1 angular
+
+thermo_style custom step time temp pe etotal press vol atoms
+# thermo_modify lost ignore flush yes  # Allow atoms to leave the box
+thermo 100
+
+# dump dmp all atom 50 Cu_95x95x48_${T}_nvt_relax.dump
+
+run 3000
+
+write_data data/data.Cu_95x95x42_${T}_nvt_relax

@@ -1,0 +1,32 @@
+units metal
+dimension 3 
+boundary p p f
+atom_style atomic 
+
+# NVT relaxation of in.Cu_relax
+
+read_data data.Cu_relaxed
+
+region void block INF INF INF INF 14.511332686472011 28.511332686472011
+region bottom block INF INF INF INF -7.281332686472011 -5.281332686472011
+
+group bottom region bottom 
+
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+velocity all create 300.0 1234 dist gaussian
+velocity bottom create 0.0 1234 dist gaussian
+
+timestep 0.001
+
+fix 1 all nvt temp 300.0 300.0 $(100*dt)
+fix 2 bottom setforce 0.0 0.0 0.0
+
+thermo_style custom step time temp pe etotal press vol
+thermo 10
+dump 3 all atom 10 Cu_relax_again.dump
+
+run 6000 
+
+write_data data.Cu_relax_again

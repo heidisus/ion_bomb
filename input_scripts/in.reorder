@@ -1,0 +1,10 @@
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+
+read_data data.Cu_194x194x55_600_nvt_relax
+
+reset_atoms id
+
+write_data data.Cu_194x194x55_600_nvt_relax

@@ -1,0 +1,35 @@
+units metal
+dimension 3 
+boundary p p f
+atom_style atomic 
+
+read_data data.Cu_relax_again
+
+region sputter block -5 5 -5 5 27.511332686472011 28.511332686472011
+region bottom block INF INF INF INF -7.281332686472011 -5.281332686472011
+
+group sputter region sputter
+group bottom region bottom 
+
+pair_style eam/alloy 
+pair_coeff * * Cu_mishin1.eam.alloy Cu
+
+velocity all create 300.0 1234 dist gaussian
+velocity bottom create 0.0 1234 dist gaussian
+
+timestep 0.001
+
+fix 1 all nvt temp 300.0 300.0 $(100*dt)
+fix 2 bottom setforce 0.0 0.0 0.0
+# vz=174 ~ 100eV
+fix 3 sputter deposit 1 1 1000 1234 region sputter units box vz -174 -174 target 0.0 0.0 21.5
+
+thermo_style custom step time temp pe etotal press vol atoms
+thermo_modify lost ignore flush yes
+thermo 100
+
+dump 10 all atom 10 sputter.dump
+
+run 1000
+
+write_data data.sputter
