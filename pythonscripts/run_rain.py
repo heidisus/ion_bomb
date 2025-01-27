@@ -1,5 +1,5 @@
 """
-Sputter atoms ontp a surface at random positions and times based on a given particle flux.
+Sputter atoms ontp a surface at random positions and times based on a given particle flux. Creates an "ion shower" effect over the entire surface.
 Usage:
     mpirun -np nprocs python3 run_rain.py
 """

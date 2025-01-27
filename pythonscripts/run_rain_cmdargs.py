@@ -1,5 +1,5 @@
 """
-Create a simulation in which atoms are sputtered onto a surface at random positions and times based on a given particle flux.
+Create a simulation in which atoms are sputtered onto a surface at random positions and times based on a given particle flux. Creates an "ion shower" effect over the entire surface.
 Usage:
     mpirun -np nprocs run_rain_cmdargs.py temperature nsteps timestep flux energy filename
 """

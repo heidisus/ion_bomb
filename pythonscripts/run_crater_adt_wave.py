@@ -1,6 +1,6 @@
 """
 Create a simulation in which atoms are sputtered onto a surface at random positions and times over the center based on a given particle flux.
-This version of the script uses an adaptive timestep.
+This version of the script uses an adaptive timestep, and sends an initial wave of ions to the surface.
 Params: 
     temperature: temperature of the surface in K
     radius: radius of the showered area in Å
@@ -74,6 +74,8 @@ while particles_inserted != n_sputtered:
     lmp.commands_list([f'run {nsteps}', 
                        f'unfix myhalt'])
 
+    # TODO: Insert multiple particles at the same time. Loop creation before going back to run? Check that the ids are correct, so all atoms get the correct velocity.
+    
     # Perform the insertion
     natoms = lmp.get_natoms()
     lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
