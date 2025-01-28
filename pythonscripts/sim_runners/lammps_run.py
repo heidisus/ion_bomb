@@ -1,6 +1,8 @@
 from lammps import lammps, LMP_VAR_ATOM
 from mpi4py import MPI
 
+"""Script to test running LAMMPS from python"""
+
 # Run parallel using mpirun -np N python3 lammps_run.py
 
 lmp = lammps()

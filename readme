@@ -1,0 +1,6 @@
+Ion Bombardment 
+
+A repository containing LAMMPS scripts, some of which are run using Python. The scripts are for ion bombardment simulations to study crater formation in the vacuum arcing process. 
+
+To run the simulations, LAMMPS, Python, and the Python LAMMPS module are required. 
+
