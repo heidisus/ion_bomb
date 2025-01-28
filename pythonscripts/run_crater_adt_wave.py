@@ -61,6 +61,7 @@ while current_time < sputter_time:
 
 n_sputtered = len(insert_times)  # number of sputtered atoms
 
+# TODO; Do we need a wave counter?
 # Initialise counters
 particles_inserted = 0
 next_insertion = insert_times[particles_inserted]
@@ -75,7 +76,7 @@ while particles_inserted != n_sputtered:
                        f'unfix myhalt'])
 
     # TODO: Insert multiple particles at the same time. Loop creation before going back to run? Check that the ids are correct, so all atoms get the correct velocity.
-    
+
     # Perform the insertion
     natoms = lmp.get_natoms()
     lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
