@@ -4,3 +4,34 @@ A repository containing LAMMPS scripts, some of which are run using Python. The 
 
 To run the simulations, LAMMPS, Python, and the Python LAMMPS module are required. 
 
+pythonscripts:
+    Contains python scripts used in the project divided among three subdirectories: helpers, lammps_functions, and sim_runners.
+
+    helpers:
+        Contains helper-programs for analysing the output, generating input data, testing etc.
+    
+    lammps_functions:
+        Contains python functions, which a LAMMPS simulation can call using fix python or other such command. These files are designed to be called from LAMMPS
+        rather than running LAMMPS.
+
+    sim_runners:
+        Contains python-scripts that run LAMMPS from python using the LAMMPS module. 
+
+lammps:
+    Contains files necessary to run LAMMPS simulations, such as input scripts, and interatomic potentials. These files are divided among four subdirectories: helpers,
+    input_scripts, legacy, and relaxation_scripts.
+
+    helpers:
+        Contains helper-scripts for analysing the output
+
+    input_scripts:
+        Contains LAMMPS input scripts used in the project.
+
+    legacy:
+        Contains scripts that are no longer needed, but may be useful to look at.
+    
+    relaxation_scripts:
+        Contains LAMMPS input scripts to relax the metal surface.
+
+energy_dist:
+    Contains the figure of the energy distribution from ArcPIC, digitized csv data of the distribution curve, and a python script sampling the distribution.
