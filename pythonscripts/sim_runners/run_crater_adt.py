@@ -40,6 +40,7 @@ nprocs = MPI.COMM_WORLD.Get_size()
 rng_seed = 214079644654894187569045748385860788528  # Random seed for the numpy generator, generated with SeedSequence.entropy
 rng = np.random.default_rng(seed=rng_seed)
 
+# TODO: Write a different method of having a cooldown after the sputtering ends. Current version is not ideal, and somewhat confusing.
 area = np.pi*(radius/10)**2  # area of the sputtered area in nm^2
 sputter_time = runtime*0.75  # time in ps during which the sputtering occurs
 flux_area = flux*area        # flux per nm^2 in particles/ps
@@ -79,6 +80,7 @@ while particles_inserted != n_sputtered:
     lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
                        f'create_atoms 1 random 1 {rng.integers(1000000, 2**31-1)} sputter overlap 1'])  # Create a new atom to be sputtered
 
+    # TODO: Check if this logic can be cleaned up, seems like the if-else is redundant
     # Check if any atoms leave the box within the same timestep
     new_natoms = lmp.get_natoms()
     new_atom_id = new_natoms
