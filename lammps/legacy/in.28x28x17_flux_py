@@ -1,11 +1,11 @@
+# Input script for the sputtering simulations, relaxed at npt and nvt. Ion shower over entire surface.
+
 units metal
 dimension 3 
 boundary p p f
 atom_style atomic 
 
 atom_modify map yes
-
-# Input script for the sputtering simulations, relaxed at npt and nvt
 
 # Surface temperature
 variable T equal 1358

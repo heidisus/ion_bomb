@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Delete unnecessary files generated from sputter simulations
+
 for i in {1..49}    
 do
     rm Cu_sputter_loops/data/data.sputter_loop_$i    

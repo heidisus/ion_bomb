@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script is used to extract the table of values from a LAMMPS output file into a csv file.
+
 # Exit if no input file is given
 if [ -z "$1" ]; then
   echo "Usage: ./table_grabber inputfile outputfile"
