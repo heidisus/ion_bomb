@@ -5,7 +5,7 @@ A repository containing LAMMPS scripts, some of which are run using Python. The 
 To run the simulations, LAMMPS, Python, and the Python LAMMPS module are required. 
 
 Python modules used:
-numpy, mpi4py, lammps python module, pandas, matplotlib, scipy, pyperclip
+numpy, mpi4py, lammps, pandas, matplotlib, scipy, pyperclip
 
 pythonscripts:
     Contains python scripts used in the project divided among three subdirectories: helpers, lammps_functions, and sim_runners.
