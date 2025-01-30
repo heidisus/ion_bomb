@@ -7,6 +7,9 @@ To run the simulations, LAMMPS, Python, and the Python LAMMPS module are require
 Python modules used:
 numpy, mpi4py, lammps, pandas, matplotlib, scipy, pyperclip
 
+LAMMPS packages used:
+MANYBODY, python
+
 pythonscripts:
     Contains python scripts used in the project divided among three subdirectories: helpers, lammps_functions, and sim_runners.
 
@@ -37,3 +40,6 @@ lammps:
 
 energy_dist:
     Contains the figure of the energy distribution from ArcPIC, digitized csv data of the distribution curve, and a python script sampling the distribution.
+
+
+As of 30.01.25 most paths to different files are incorrect, as the architecture was changed significantly.
