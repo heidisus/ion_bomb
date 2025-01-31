@@ -8,12 +8,12 @@ atom_modify map yes
 # Input script for the sputtering simulations, already relaxed at npt and nvt
 # Requires variables T (Initial temperature), r (radius of sputtered area in Å)
 
-read_data data/lammps_datafiles/data.Cu_28x28x17_${T}_nvt_relax
+read_data lammps/data/data.Cu_14x14x8_${T}_nvt_relax
 reset_atoms id
 
 # Set pair style
 pair_style eam/alloy 
-pair_coeff * * Cu_mishin1.eam.alloy Cu
+pair_coeff * * lammps/Cu_mishin1.eam.alloy Cu
 
 # Box coordinates
 variable xlo equal xlo
@@ -32,8 +32,8 @@ variable cyl_top equal (${zhi}-5)
 variable area equal ((v_xhi-v_xlo)*(v_yhi-v_ylo)/100)   # Surface area in nm^2
 
 # Set regions and groups
-region bottom block INF INF INF INF INF -25			                        	    # Region where momentum is zeroed
-region surface block INF INF INF INF 30 50                                          # Region where the temperature is calculated
+region bottom block INF INF INF INF INF -5			                        	    # Region where momentum is zeroed
+region surface block INF INF INF INF 10 20                                          # Region where the temperature is calculated
 region sputter cylinder z 0.0 0.0 ${r} ${cyl_bot} ${cyl_top} units box              # Sputter only over the crater  z-axis|x|y|radius|zlo|zhi|units
 
 group bottom region bottom 
@@ -61,5 +61,5 @@ thermo 150
 # dump_modify every/time allows to dump once t time has passed
 # dump dmp all custom 500 /scratch/djurabek/heilait/crater_$T_${flux}.dump id type xs ys zs
 #dump dmp all custom 200 /scratch/djurabek/heilait/ionshower_$T_${flux}.dump id type xs ys zs vx vy vz
-dump dmp all custom 30 adtcratertest_$T.dump id type xs ys zs
+dump dmp all custom 30 lammps/data/wavetest_$T.dump id type xs ys zs
 

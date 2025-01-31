@@ -9,7 +9,7 @@ Params:
     energy: incidence energy of the sputtered atoms in eV
     filename: name of the LAMMPS input file
 Usage:
-    mpirun -np nprocs run_crater_adt.py temperature radius runtime flux energy filename
+    mpirun -np nprocs run_wave.py temperature radius runtime flux energy filename
 """
 
 from lammps import lammps
@@ -61,12 +61,12 @@ while current_time < sputter_time:
 
 n_sputtered = len(insert_times)  # number of sputtered atoms
 
-# TODO; Do we need a wave counter?
+# TODO: Do we need a wave counter?
 # Initialise counters
 particles_inserted = 0
 next_insertion = insert_times[particles_inserted]
 
-while particles_inserted != n_sputtered:
+while particles_inserted < n_sputtered:
     # Set the insertion time
     next_insertion = insert_times[particles_inserted]
     lmp.command(f'fix myhalt all halt 1 v_timee >= {next_insertion} error continue')
@@ -77,26 +77,27 @@ while particles_inserted != n_sputtered:
 
     # TODO: Insert multiple particles at the same time. Loop creation before going back to run? Check that the ids are correct, so all atoms get the correct velocity.
 
-    # Perform the insertion
-    natoms = lmp.get_natoms()
-    lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
-                       f'create_atoms 1 random 1 {rng.integers(1000000, 2**31-1)} sputter overlap 1'])  # Create a new atom to be sputtered
+    for i in range(10):
+        # Perform the insertion
+        natoms = lmp.get_natoms()
+        lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
+                        f'create_atoms 1 random 1 {rng.integers(1000000, 2**31-1)} sputter overlap 1'])  # Create a new atom to be sputtered
 
-    # Check if any atoms leave the box within the same timestep
-    new_natoms = lmp.get_natoms()
-    new_atom_id = new_natoms
-    
-    if new_natoms == natoms:
-        # An atom has just left - the new atom's atom_id is natoms
-        lmp.command(f'group newatom id {natoms}')
-    else:
-        # No atoms have left - the new atom's atom_id is new_natoms
-        lmp.command(f'group newatom id {new_atom_id}')
+        # Check if any atoms leave the box within the same timestep
+        new_natoms = lmp.get_natoms()
+        new_atom_id = new_natoms
+        
+        if new_natoms == natoms:
+            # An atom has just left - the new atom's atom_id is natoms
+            lmp.command(f'group newatom id {natoms}')
+        else:
+            # No atoms have left - the new atom's atom_id is new_natoms
+            lmp.command(f'group newatom id {new_atom_id}')
 
-    particles_inserted += 1
-    lmp.commands_list([f'velocity newatom set {vx} {vy} {vz}',      # Give the atom a downwards speed
-                       f'group newatom delete',                     # Delete the group
-                       f'variable inserted_atoms equal {particles_inserted}'])
+        particles_inserted += 1
+        lmp.commands_list([f'velocity newatom set {vx} {vy} {vz}',      # Give the atom a downwards speed
+                        f'group newatom delete',                     # Delete the group
+                        f'variable inserted_atoms equal {particles_inserted}'])
 
 
 # Once all particles have been added, run until the end

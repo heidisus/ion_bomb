@@ -49,6 +49,7 @@ vx = 0   # x-component of the velocity
 vy = 0   # y-component of the velocity
 vz = -v  # z-component of the velocity
 
+# TODO: Will the ion shower be implemented alongside the cluster?
 # Sample the arrival times of the sputtered atoms as a Poisson process 
 current_time = 0
 insert_times = []
@@ -60,7 +61,6 @@ while current_time < sputter_time:
 
 n_sputtered = len(insert_times)  # number of sputtered atoms
 
-# TODO; Do we need a wave counter?
 # Initialise counters
 particles_inserted = 0
 next_insertion = insert_times[particles_inserted]

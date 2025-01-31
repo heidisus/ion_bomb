@@ -31,7 +31,7 @@ variable area equal ((v_xhi-v_xlo)*(v_yhi-v_ylo)/100)   # Surface area in nm^2
 # Set regions and groups
 region bottom block INF INF INF INF INF -5			                        	    # Region where momentum is zeroed
 region surface block INF INF INF INF 10 20                                          # Region where the temperature is calculated
-region droplet sphere 0.0 0.0 50.0 5.0 units box
+region droplet sphere 0.0 0.0 50.0 3.0 units box
 
 lattice fcc 3.615
 create_atoms 1 region droplet
@@ -48,7 +48,6 @@ variable timee equal time      # Monitor time through variable
 # Set velocities for groups
 velocity all create $T 908476724 dist gaussian
 velocity bottom set 0 0 0
-velocity droplet set 0 0 -25.4
 
 # Set system to nve, set the bottom momentum to 0
 fix 1 all nve
@@ -63,5 +62,9 @@ thermo 150
 # dump dmp all custom 500 /scratch/djurabek/heilait/crater_$T_${flux}.dump id type xs ys zs
 #dump dmp all custom 200 /scratch/djurabek/heilait/ionshower_$T_${flux}.dump id type xs ys zs vx vy vz
 dump dmp all custom 30 lammps/data/droptest_$T.dump id type xs ys zs
+
+run 500
+
+velocity droplet set 0 0 -60
 
 run 3000
