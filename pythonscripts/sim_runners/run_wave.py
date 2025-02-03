@@ -53,31 +53,33 @@ vz = -v  # z-component of the velocity
 # Sample the arrival times of the sputtered atoms as a Poisson process 
 current_time = 0
 insert_times = []
+wave_period = runtime/3
+waves = 1
 
 while current_time < sputter_time:
+    # Create a list of (insertion time, number of particles to insert) tuples
     arrival_time = rng.exponential(scale=1/flux_area)
     current_time += arrival_time
-    insert_times.append(current_time)
 
-n_sputtered = len(insert_times)  # number of sputtered atoms
+    if current_time >= wave_period:
+        waves += 1
+        wave_period = waves * runtime/3
+        insert_times.append((current_time, 10))
+    else:
+        insert_times.append((current_time, 1))
 
-# TODO: Do we need a wave counter?
+print(insert_times)
+n_insertions = len(insert_times)  # number of insertions to be made
+
 # Initialise counters
-particles_inserted = 0
-next_insertion = insert_times[particles_inserted]
+insertions_made = 0
+next_insertion = insert_times[insertions_made][0]
 
-while particles_inserted < n_sputtered:
-    # Set the insertion time
-    next_insertion = insert_times[particles_inserted]
-    lmp.command(f'fix myhalt all halt 1 v_timee >= {next_insertion} error continue')
+# Function to insert particles
+def insert_particles(n):
+    global insertions_made
 
-    # Run until we reach the next insertion, the simulation will run until the next insertion point is reached
-    lmp.commands_list([f'run {nsteps}', 
-                       f'unfix myhalt'])
-
-    # TODO: Insert multiple particles at the same time. Loop creation before going back to run? Check that the ids are correct, so all atoms get the correct velocity.
-
-    for i in range(10):
+    for i in range(n):
         # Perform the insertion
         natoms = lmp.get_natoms()
         lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
@@ -94,10 +96,25 @@ while particles_inserted < n_sputtered:
             # No atoms have left - the new atom's atom_id is new_natoms
             lmp.command(f'group newatom id {new_atom_id}')
 
-        particles_inserted += 1
         lmp.commands_list([f'velocity newatom set {vx} {vy} {vz}',      # Give the atom a downwards speed
-                        f'group newatom delete',                     # Delete the group
-                        f'variable inserted_atoms equal {particles_inserted}'])
+                           f'group newatom delete',                     # Delete the group
+                           f'variable inserted_atoms equal {insertions_made}'])  # TODO: Fix this to reflect the number of atoms, not the number of insertions
+
+    insertions_made += 1
+
+
+# TODO: Make sure the flux stays consistent
+# Run the simulation
+while insertions_made < n_insertions:
+    # Set the insertion time
+    next_insertion = insert_times[insertions_made][0]
+    lmp.command(f'fix myhalt all halt 1 v_timee >= {next_insertion} error continue')
+
+    # Run until we reach the next insertion point
+    lmp.commands_list([f'run {nsteps}', 
+                       f'unfix myhalt'])
+    
+    insert_particles(insert_times[insertions_made][1])
 
 
 # Once all particles have been added, run until the end
@@ -110,8 +127,8 @@ print("Proc %d out of %d procs has" % (rank,nprocs),lmp)
 
 if rank == 0:
     print(f'Area: {area}')
-    print(f'Inserted particles: {particles_inserted}')
-    print(f'Deposited energy per nm^2: {particles_inserted*energy/area}')
-    print(f'Flux: {particles_inserted/sputter_time/area}')
+    print(f'Inserted particles: {insertions_made}')
+    print(f'Deposited energy per nm^2: {insertions_made*energy/area}')
+    print(f'Flux: {insertions_made/sputter_time/area}')
 
 MPI.Finalize()
