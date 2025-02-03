@@ -3,3 +3,4 @@ log.lammps
 lammps/data/
 time_calc.py
 output/
+energy_dist/
