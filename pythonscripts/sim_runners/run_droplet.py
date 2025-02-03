@@ -74,8 +74,6 @@ while particles_inserted != n_sputtered:
     lmp.commands_list([f'run {nsteps}', 
                        f'unfix myhalt'])
 
-    # TODO: Insert multiple particles at the same time. Loop creation before going back to run? Check that the ids are correct, so all atoms get the correct velocity.
-
     # Perform the insertion
     natoms = lmp.get_natoms()
     lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group

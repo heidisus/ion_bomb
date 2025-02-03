@@ -31,7 +31,8 @@ variable area equal ((v_xhi-v_xlo)*(v_yhi-v_ylo)/100)   # Surface area in nm^2
 # Set regions and groups
 region bottom block INF INF INF INF INF -5			                        	    # Region where momentum is zeroed
 region surface block INF INF INF INF 10 20                                          # Region where the temperature is calculated
-region droplet sphere 0.0 0.0 50.0 5.0 units box
+region droplet sphere 0.0 0.0 50.0 3.0 units box
+region sputter cylinder z 0.0 0.0 ${r} ${cyl_bot} ${cyl_top} units box              # Sputter only over the crater  z-axis|x|y|radius|zlo|zhi|units
 
 lattice fcc 3.615
 create_atoms 1 region droplet
@@ -39,9 +40,10 @@ create_atoms 1 region droplet
 group bottom region bottom 
 group surface region surface 
 group droplet region droplet
+group sputter region sputter
 
 compute dropletcount droplet count/type atom
-variable v equal sqrt(100*2.0/(63.55*c_dropletcount[1]))*98.2269    # 100 eV incidence energy
+variable v equal sqrt(100*2.0/(63.55))*98.2269    # 100 eV incidence energy  c_dropletcount[1] is the number of atoms in the droplet
 
 variable inserted_atoms equal 0
 compute tsurf surface temp 
@@ -70,4 +72,4 @@ run 100
 
 velocity droplet set 0 0 -${v} units box
 
-run 5000
+# run 5000
