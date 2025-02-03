@@ -1,0 +1,330 @@
+LAMMPS (19 Nov 2024)
+WARNING: Using I/O redirection is unreliable with parallel runs. Better to use the -in switch to read input files. (../lammps.cpp:571)
+Reading data file ...
+  orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  1 by 2 by 2 MPI processor grid
+  reading atom labelmap ...
+  reading atoms ...
+  6272 atoms
+  reading velocities ...
+  6272 velocities
+  read_data CPU = 0.027 seconds
+Resetting atom IDs ...
+WARNING: Communication cutoff is 0.0. No ghost atoms will be generated. Atoms may get lost. (../comm_brick.cpp:212)
+Reading eam/alloy potential file lammps/Cu_mishin1.eam.alloy with DATE: 2007-10-12
+1372 atoms in group bottom
+1764 atoms in group surface
+0 atoms in group sputter
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+- Type Label Framework: https://doi.org/10.1021/acs.jpcb.3c08419
+The log file lists these citations in BibTeX format.
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.50679
+  ghost atom cutoff = 7.50679
+  binsize = 3.753395, bins = 14 14 24
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+Per MPI rank memory allocation (min/avg/max) = 3.276 | 3.811 | 4.347 Mbytes
+   Step          Time           Temp          PotEng         TotEng         Press          Volume        Atoms       c_tsurf     v_inserted_atoms
+         0   0              783.63615     -20754.658     -20119.45      -1515.5424      237332.26           6272   995.19399      0            
+       150   0.90643566     901.75762     -20851.603     -20120.647     -1330.3629      237332.26           6272   1011.2897      0            
+       300   1.8204762      897.05537     -20847.826     -20120.681     -920.43424      237332.26           6272   990.43234      0            
+       450   2.7533621      895.83549     -20846.985     -20120.829     -2524.4249      237332.26           6272   951.4514       0            
+       600   3.6826377      908.80854     -20857.803     -20121.132     -1350.4822      237332.26           6272   924.76248      0            
+       750   4.6268153      889.47659     -20842.128     -20121.127     -2504.8419      237332.26           6272   917.3467       0            
+       900   5.5666234      905.76859     -20855.732     -20121.525     -2027.0772      237332.26           6272   920.36264      0            
+      1050   6.5208731      903.22822     -20853.814     -20121.666     -1084.453       237332.26           6272   917.23801      0            
+      1200   7.4718569      895.68769     -20847.891     -20121.855     -2658.647       237332.26           6272   906.06136      0            
+      1350   8.4016479      905.84378     -20856.523     -20122.254     -1233.3671      237332.26           6272   895.69963      0            
+Fix halt condition for fix-id myhalt met on step 1376 with value 8.566580359559916 (../fix_halt.cpp:240)
+Loop time of 7.3391 on 4 procs for 1376 steps with 6272 atoms
+
+Performance: 96.751 ns/day, 0.248 hours/ns, 187.489 timesteps/s, 1.176 Matom-step/s
+99.6% CPU use with 4 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 3.0771     | 4.7676     | 6.5233     |  77.4 | 64.96
+Neigh   | 0.00080522 | 0.23068    | 0.46275    |  47.9 |  3.14
+Comm    | 0.10982    | 2.0362     | 3.9624     | 130.3 | 27.74
+Output  | 0.11866    | 0.12008    | 0.12122    |   0.3 |  1.64
+Modify  | 0.10035    | 0.15638    | 0.27935    |  18.5 |  2.13
+Other   |            | 0.02812    |            |       |  0.38
+
+Nlocal:           1568 ave        3136 max           0 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+Nghost:        1997.75 ave        3471 max         520 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+Neighs:         100348 ave      201699 max           0 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+
+Total # of neighbors = 401394
+Ave neighs/atom = 63.997768
+Neighbor list builds = 104
+Dangerous builds = 0
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 1376
+  Time step     : 0.005972625801239989
+Per MPI rank memory allocation (min/avg/max) = 3.872 | 4.795 | 5.718 Mbytes
+   Step          Time           Temp          PotEng         TotEng         Press          Volume        Atoms       c_tsurf     v_inserted_atoms
+      1376   8.5665804      2139.6029     -20861.817     -19124.71       3591.3989      237332.26           6282   904.33303      10           
+      1500   8.6358288      2136.0916     -20858.969     -19124.713      3844.9494      237332.26           6282   900.66978      10           
+      1650   8.7169987      2147.5419     -20868.267     -19124.715      3000.3807      237332.26           6282   902.97286      10           
+      1800   8.8016496      1988.8534     -20739.626     -19124.91       5773.0892      237332.26           6282   2637.1152      10           
+      1950   8.9538124      1618.501      -20438.709     -19124.675      10930.186      237332.26           6282   2483.808       10           
+      2100   9.1946462      1416.9527     -20275.274     -19124.874      10579.01       237332.26           6282   1847.0702      10           
+      2250   9.435582       1421.5709     -20279.8       -19125.651      5370.9994      237332.26           6282   1735.3757      10           
+      2400   9.6765178      1396.438      -20259.467     -19125.723      2100.5155      237332.26           6282   1853.2424      10           
+      2550   9.9174536      1329.9002     -20205.565     -19125.841     -6854.9454      237332.26           6282   1826.6241      10           
+      2700   10.227464      1210.2908     -20121.326     -19138.712     -12288.438      237332.26           6281   1523.2222      10           
+      2850   10.583524      1237.9123     -20148.991     -19143.951     -9908.1521      237332.26           6280   1515.6136      10           
+      3000   10.943431      1321.8515     -20223.327     -19150.138     -4004.2582      237332.26           6279   1601.1957      10           
+      3150   11.476698      1359.688      -20265.981     -19162.073      8894.2631      237332.26           6275   1574.6836      10           
+      3300   12.203449      1329.9532     -20242.869     -19163.103      1609.7701      237332.26           6275   1489.9749      10           
+      3450   12.957584      1208.237      -20144.423     -19163.476     -10437.08       237332.26           6273   1320.7738      10           
+      3600   13.744272      1301.1392     -20221.135     -19164.763      133.89071      237332.26           6273   1373.103       10           
+      3750   14.444406      1358.524      -20268.991     -19166.028      6971.1349      237332.26           6273   1357.0549      10           
+      3900   15.176513      1259.4186     -20182.679     -19160.178     -4127.1376      237332.26           6269   1339.3615      10           
+      4050   15.997746      1235.4839     -20164.523     -19161.455     -5757.3384      237332.26           6268   1275.8588      10           
+      4200   16.804135      1322.3734     -20235.908     -19162.295      4630.6511      237332.26           6268   1371.2672      10           
+      4350   17.578867      1289.8424     -20210.096     -19162.895      450.23186      237332.26           6268   1313.8632      10           
+      4500   18.359095      1227.461      -20159.463     -19162.908     -6721.6058      237332.26           6268   1248.0263      10           
+      4650   19.162193      1296.5626     -20216.503     -19163.846     -336.63334      237332.26           6268   1272.991       10           
+      4800   19.934662      1314.21       -20231.645     -19164.661      2760.898       237332.26           6268   1288.9281      10           
+      4950   20.725414      1260.3321     -20187.798     -19164.556     -3847.4042      237332.26           6268   1310.0882      10           
+      5100   21.534429      1265.8228     -20192.589     -19164.889     -3194.5266      237332.26           6268   1272.3039      10           
+      5250   22.301015      1325.7556     -20241.879     -19165.521      2181.9037      237332.26           6268   1359.4669      10           
+      5400   23.07928       1284.8624     -20208.96      -19165.803     -140.82223      237332.26           6268   1298.191       10           
+      5550   23.886022      1255.8948     -20185.608     -19165.968     -4065.5721      237332.26           6268   1298.3262      10           
+      5700   24.662205      1298.8252     -20220.921     -19166.427      200.71101      237332.26           6268   1303.2121      10           
+      5850   25.42602       1324.9701     -20242.631     -19166.91       1254.0613      237332.26           6268   1340.7752      10           
+      6000   26.20283       1277.9298     -20204.429     -19166.9       -2684.1182      237332.26           6268   1297.3151      10           
+      6150   26.989688      1317.5095     -20237.167     -19167.503     -1992.9073      237332.26           6268   1337.2565      10           
+      6300   27.780965      1310.2776     -20231.39      -19167.598      1285.9494      237332.26           6268   1288.4764      10           
+      6450   28.547684      1303.9505     -20226.501     -19167.845     -2001.2692      237332.26           6268   1327.8646      10           
+      6600   29.340805      1284.6789     -20211.137     -19168.128     -1814.2676      237332.26           6268   1275.7742      10           
+      6750   30.131701      1317.4519     -20238.129     -19168.512      539.91543      237332.26           6268   1319.8536      10           
+      6900   30.921276      1291.866      -20217.745     -19168.901     -216.92342      237332.26           6268   1285.8936      10           
+      7050   31.699226      1295.1706     -20220.778     -19169.252     -2338.9443      237332.26           6268   1326.8648      10           
+      7200   32.469222      1280.8455     -20209.296     -19169.399     -459.4015       237332.26           6268   1307.0151      10           
+      7350   33.23683       1284.424      -20212.378     -19169.576     -325.94928      237332.26           6268   1294.8946      10           
+      7500   34.030701      1289.4909     -20216.932     -19170.016     -1094.2484      237332.26           6268   1278.9637      10           
+Fix halt condition for fix-id myhalt met on step 7583 with value 34.485781501031866 (../fix_halt.cpp:240)
+Loop time of 37.7421 on 4 procs for 6207 steps with 6268 atoms
+
+Performance: 76.278 ns/day, 0.315 hours/ns, 164.458 timesteps/s, 1.031 Matom-step/s
+99.7% CPU use with 4 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 16.037     | 24.082     | 32.847     | 164.2 | 63.81
+Neigh   | 0.0054633  | 1.3061     | 2.6557     | 113.8 |  3.46
+Comm    | 0.87317    | 10.418     | 19.779     | 272.7 | 27.60
+Output  | 0.72738    | 0.73723    | 0.74546    |   0.9 |  1.95
+Modify  | 0.50325    | 1.0484     | 2.1723     |  66.4 |  2.78
+Other   |            | 0.1498     |            |       |  0.40
+
+Nlocal:           1567 ave        3151 max           0 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+Nghost:        2005.25 ave        3365 max         624 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+Neighs:          98105 ave      198924 max           0 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+
+Total # of neighbors = 392420
+Ave neighs/atom = 62.606892
+Neighbor list builds = 543
+Dangerous builds = 0
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Resetting atom IDs ...
+Created 1 atoms
+  using lattice units in orthogonal box = (-22.141773 -22.141773 -21.103156) to (29.371773 29.371773 68.333156)
+  create_atoms CPU = 0.000 seconds
+1 atoms in group newatom
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 7583
+  Time step     : 0.005368218538479714
+Per MPI rank memory allocation (min/avg/max) = 3.881 | 4.802 | 5.722 Mbytes
+   Step          Time           Temp          PotEng         TotEng         Press          Volume        Atoms       c_tsurf     v_inserted_atoms
+      7583   34.485782      2530.2468     -20224.842     -18171.886      2506.1017      237332.26           6278   1267.9576      20           
+      7650   34.524105      2526.7685     -20222.021     -18171.887      2416.1811      237332.26           6278   1332.0333      20           
+      7800   34.608149      2530.2918     -20224.884     -18171.891      2618.698       237332.26           6278   1323.2971      20           
+      7950   34.689769      2501.4929     -20201.613     -18171.987      2996.6806      237332.26           6278   1306.7229      20           
+      8100   34.784155      2198.7756     -19956.047     -18172.036      8073.1916      237332.26           6278   3536.5515      20           
+      8250   35.031948      1969.1178     -19769.519     -18171.844      11113.39       237332.26           6278   2500.4526      20           
+      8400   35.335284      1791.2146     -19626.328     -18172.997      9384.3536      237332.26           6278   2181.2759      20           
+      8550   35.63862       1811.0847     -19642.683     -18173.231      3727.0937      237332.26           6278   2252.1317      20           
+      8700   35.941956      1690.9469     -19545.213     -18173.236     -5430.5285      237332.26           6278   2275.4569      20           
+      8850   36.259196      1527.6109     -19420.904     -18181.453     -11417.31       237332.26           6277   1955.5213      20           
+      9000   36.595309      1488.449      -19399.742     -18192.065     -12279.063      237332.26           6275   1885.0067      20           
+      9150   36.943359      1524.3322     -19431.613     -18194.822     -7713.7562      237332.26           6274   1965.6254      20           
+      9300   37.291409      1585.8934     -19481.686     -18194.946     -2419.6224      237332.26           6274   1914.8563      20           
+      9450   37.639459      1639.7123     -19525.528     -18195.122      4078.4154      237332.26           6274   1899.4118      20           
+      9600   38.09546       1645.1502     -19536.563     -18201.745      7093.8275      237332.26           6273   1893.6205      20           
+      9750   38.758123      1562.9644     -19469.98      -18201.843     -558.70192      237332.26           6273   1762.3642      20           
+      9900   39.458984      1482.2383     -19404.625     -18201.987     -6848.9512      237332.26           6273   1641.2181      20           
+     10050   40.177419      1546.7624     -19457.597     -18202.607     -3038.556       237332.26           6273   1719.4634      20           
+     10200   40.891049      1596.2081     -19498.409     -18203.3        2901.2213      237332.26           6273   1732.9421      20           
+     10350   41.601823      1549.1986     -19460.686     -18203.719      940.19163      237332.26           6273   1608.2122      20           
+     10500   42.315133      1510.9644     -19430.008     -18204.063     -4024.2181      237332.26           6273   1623.3263      20           
+     10650   43.051433      1524.8132     -19441.889     -18204.707     -3365.4197      237332.26           6273   1593.5942      20           
+     10800   43.785694      1542.5252     -19456.796     -18205.243      1212.3941      237332.26           6273   1594.0631      20           
+     10950   44.511813      1552.2574     -19465.227     -18205.778      1129.4951      237332.26           6273   1549.1547      20           
+     11100   45.249843      1544.4036     -19459.285     -18206.209     -2580.3989      237332.26           6273   1590.4097      20           
+     11250   45.973156      1527.8007     -19446.267     -18206.661     -2558.2451      237332.26           6273   1567.2102      20           
+     11400   46.684153      1540.9091     -19457.52      -18207.278     -148.71464      237332.26           6273   1561.4272      20           
+     11550   47.401744      1553.4735     -19468.32      -18207.885     -314.72727      237332.26           6273   1570.0008      20           
+     11700   48.098898      1548.4117     -19464.985     -18208.656     -1102.9987      237332.26           6273   1543.4632      20           
+     11850   48.820668      1535.0643     -19454.341     -18208.843     -2466.0397      237332.26           6273   1574.2863      20           
+     12000   49.539094      1540.1282     -19458.943     -18209.335     -1361.9814      237332.26           6273   1576.6866      20           
+     12150   50.232912      1546.6297     -19464.941     -18210.059     -163.59864      237332.26           6273   1556.4946      20           
+Fix halt condition for fix-id myhalt met on step 12200 with value 50.47749558786397 (../fix_halt.cpp:240)
+Loop time of 29.2782 on 4 procs for 4617 steps with 6273 atoms
+
+Performance: 66.605 ns/day, 0.360 hours/ns, 157.694 timesteps/s, 989.215 katom-step/s
+99.6% CPU use with 4 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 12.491     | 18.536     | 25.124     | 140.5 | 63.31
+Neigh   | 0.0054226  | 1.0174     | 2.0718     | 100.3 |  3.47
+Comm    | 0.97143    | 8.2256     | 15.127     | 232.7 | 28.09
+Output  | 0.60602    | 0.61271    | 0.61787    |   0.6 |  2.09
+Modify  | 0.39831    | 0.75318    | 1.3562     |  45.4 |  2.57
+Other   |            | 0.133      |            |       |  0.45
+Proc 1 out of 4 procs has <lammps.core.lammps object at 0x7e936c02d3d0>
+Proc 2 out of 4 procs has <lammps.core.lammps object at 0x784333a2d3d0>
+Proc 3 out of 4 procs has <lammps.core.lammps object at 0x736298931430>
+
+Nlocal:        1568.25 ave        3156 max           0 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+Nghost:           2061 ave        3338 max         779 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+Neighs:        93086.8 ave      187489 max           0 min
+Histogram: 2 0 0 0 0 0 0 0 0 2
+
+Total # of neighbors = 372347
+Ave neighs/atom = 59.357086
+Neighbor list builds = 412
+Dangerous builds = 0
+Proc 0 out of 4 procs has <lammps.core.lammps object at 0x79208cf96780>
+Area: 3.141592653589793
+Inserted particles: 20
+Deposited energy per nm^2: 636.6197723675814
+Flux: 0.16976527263135502
+Total wall time: 0:01:14

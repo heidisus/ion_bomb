@@ -81,7 +81,7 @@ while particles_inserted < n_sputtered:
         # Perform the insertion
         natoms = lmp.get_natoms()
         lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
-                        f'create_atoms 1 random 1 {rng.integers(1000000, 2**31-1)} sputter overlap 1'])  # Create a new atom to be sputtered
+                           f'create_atoms 1 random 1 {rng.integers(1000000, 2**31-1)} sputter overlap 1'])  # Create a new atom to be sputtered
 
         # Check if any atoms leave the box within the same timestep
         new_natoms = lmp.get_natoms()

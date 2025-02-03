@@ -63,8 +63,8 @@ thermo 150
 #dump dmp all custom 200 /scratch/djurabek/heilait/ionshower_$T_${flux}.dump id type xs ys zs vx vy vz
 dump dmp all custom 30 lammps/data/droptest_$T.dump id type xs ys zs
 
-run 500
+run 100
 
 velocity droplet set 0 0 -60
 
-run 3000
+run 5000
