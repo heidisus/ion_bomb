@@ -61,7 +61,6 @@ current_time = 0
 insert_times = []
 waves = 0
 wave_insertion = waves * wave_period  # The next insertion after this time will insert a wave
-wave_particles = 10
 
 # TODO: Make the insertion process fit the flux
 while current_time < sputter_time:
