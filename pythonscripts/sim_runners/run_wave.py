@@ -7,9 +7,11 @@ Params:
     runtime: total runtime in ps
     flux: particle flux in particles/ps/nm^2
     energy: incidence energy of the sputtered atoms in eV
+    wave_period: time between waves in ps
+    wave_particles: number of particles in each wave
     filename: name of the LAMMPS input file
 Usage:
-    mpirun -np nprocs run_wave.py temperature radius runtime flux energy filename
+    mpirun -np nprocs python3 run_wave.py temperature radius runtime flux energy wave_period wave_particles filename
 """
 
 from lammps import lammps
@@ -20,14 +22,15 @@ import sys
 # Create the lammps instance based on an input script
 lmp = lammps()
 
-# TODO: Add the wave period as an arg?
 # Set initial run parameters
 temperature = float(sys.argv[1])    # temperature of the of the surface in K
 radius = int(sys.argv[2])           # radius of the showered area in Å
 runtime = float(sys.argv[3])        # total runtime in ps
 flux = float(sys.argv[4])           # particle flux in particles/ps/nm^2
 energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in eV
-input_file = sys.argv[6]            # name of the input file
+wave_period = float(sys.argv[6])    # time between waves in ps
+wave_particles = int(sys.argv[7])   # number of particles in each wave
+input_file = sys.argv[8]            # name of the input file
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
@@ -43,7 +46,7 @@ rng = np.random.default_rng(seed=rng_seed)
 
 # TODO: fix the "sputter time", this is a dumb way to do it
 area = np.pi*(radius/10)**2  # area of the sputtered area in nm^2
-sputter_time = runtime*0.75  # time in ps during which the sputtering occurs
+sputter_time = runtime # *0.75  # time in ps during which the sputtering occurs
 flux_area = flux*area        # flux per nm^2 in particles/ps
 nsteps = int(runtime*10000)  # this argument is passed to the run command as it requires a parameter, however, the actual number of steps taken is controlled by the halt command and the insertion times to use an adaptive timestep but also determine the total simulation time needed, rather than steps. 
 
@@ -57,9 +60,8 @@ vz = -v  # z-component of the velocity
 current_time = 0
 insert_times = []
 waves = 0
-wave_period = 10  # Time between waves in ps
 wave_insertion = waves * wave_period  # The next insertion after this time will insert a wave
-n_particles_wave = 10
+wave_particles = 10
 
 # TODO: Make the insertion process fit the flux
 while current_time < sputter_time:
@@ -69,7 +71,7 @@ while current_time < sputter_time:
 
     if current_time >= wave_insertion:
         waves += 1
-        insert_times.append((current_time, n_particles_wave))
+        insert_times.append((current_time, wave_particles))
         wave_insertion = waves * wave_period + insert_times[0][0]  # Make sure the next wave is not inserted immediately after the first one, but after the wave period    
     else:
         insert_times.append((current_time, 1))
@@ -110,7 +112,6 @@ def insert_particles(n):
     lmp.command(f'variable inserted_atoms equal {inserted_particles}')
 
 
-# TODO: Make sure the flux stays consistent
 # Run the simulation
 while insertions_made < n_insertions:
     # Set the insertion time
