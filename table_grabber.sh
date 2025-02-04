@@ -25,6 +25,7 @@ grep '^\s*Step' "$inputfile" | head -1 > $outputfile
 awk '/^[[:space:]]*[0-9]+[[:space:]]+[0-9.]+[[:space:]]/' "$inputfile" >> $outputfile
 
 # Get the final printed values:
-# grep '^Area:' "$inputfile" >> $outputfile
-# grep '^Inserted' >> $outputfile
-# grep '^Deposited' >> $outputfile
+grep '^Area ' "$inputfile" >> $outputfile
+grep '^Inserted ' "$inputfile" >> $outputfile
+grep '^Deposited ' "$inputfile" >> $outputfile
+grep '^Flux:' "$inputfile" >> $outputfile

@@ -107,7 +107,7 @@ lmp.command(f'run {nsteps}')
 print("Proc %d out of %d procs has" % (rank,nprocs),lmp)
 
 if rank == 0:
-    print(f'Area: {area}')
+    print(f'Area (nm^2): {area}')
     print(f'Inserted particles: {particles_inserted}')
     print(f'Deposited energy per nm^2: {particles_inserted*energy/area}')
     print(f'Flux: {particles_inserted/sputter_time/area}')

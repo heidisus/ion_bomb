@@ -20,6 +20,7 @@ import sys
 # Create the lammps instance based on an input script
 lmp = lammps()
 
+# TODO: Add the wave period as an arg?
 # Set initial run parameters
 temperature = float(sys.argv[1])    # temperature of the of the surface in K
 radius = int(sys.argv[2])           # radius of the showered area in Å
@@ -40,6 +41,7 @@ nprocs = MPI.COMM_WORLD.Get_size()
 rng_seed = 214079644654894187569045748385860788528  # Random seed for the numpy generator, generated with SeedSequence.entropy
 rng = np.random.default_rng(seed=rng_seed)
 
+# TODO: fix the "sputter time", this is a dumb way to do it
 area = np.pi*(radius/10)**2  # area of the sputtered area in nm^2
 sputter_time = runtime*0.75  # time in ps during which the sputtering occurs
 flux_area = flux*area        # flux per nm^2 in particles/ps
@@ -51,33 +53,37 @@ vy = 0   # y-component of the velocity
 vz = -v  # z-component of the velocity
 
 # Sample the arrival times of the sputtered atoms as a Poisson process 
+
 current_time = 0
 insert_times = []
-wave_period = runtime/3
-waves = 1
+waves = 0
+wave_period = 10  # Time between waves in ps
+wave_insertion = waves * wave_period  # The next insertion after this time will insert a wave
+n_particles_wave = 10
 
+# TODO: Make the insertion process fit the flux
 while current_time < sputter_time:
     # Create a list of (insertion time, number of particles to insert) tuples
     arrival_time = rng.exponential(scale=1/flux_area)
     current_time += arrival_time
 
-    if current_time >= wave_period:
+    if current_time >= wave_insertion:
         waves += 1
-        wave_period = waves * runtime/3
-        insert_times.append((current_time, 10))
+        insert_times.append((current_time, n_particles_wave))
+        wave_insertion = waves * wave_period + insert_times[0][0]  # Make sure the next wave is not inserted immediately after the first one, but after the wave period    
     else:
         insert_times.append((current_time, 1))
 
-print(insert_times)
 n_insertions = len(insert_times)  # number of insertions to be made
 
 # Initialise counters
 insertions_made = 0
+inserted_particles = 0
 next_insertion = insert_times[insertions_made][0]
 
 # Function to insert particles
 def insert_particles(n):
-    global insertions_made
+    global insertions_made, inserted_particles
 
     for i in range(n):
         # Perform the insertion
@@ -97,10 +103,11 @@ def insert_particles(n):
             lmp.command(f'group newatom id {new_atom_id}')
 
         lmp.commands_list([f'velocity newatom set {vx} {vy} {vz}',      # Give the atom a downwards speed
-                           f'group newatom delete',                     # Delete the group
-                           f'variable inserted_atoms equal {insertions_made}'])  # TODO: Fix this to reflect the number of atoms, not the number of insertions
-
+                           f'group newatom delete'])                    # Delete the group
+                           
     insertions_made += 1
+    inserted_particles += n
+    lmp.command(f'variable inserted_atoms equal {inserted_particles}')
 
 
 # TODO: Make sure the flux stays consistent
@@ -126,9 +133,9 @@ lmp.command(f'run {nsteps}')
 print("Proc %d out of %d procs has" % (rank,nprocs),lmp)
 
 if rank == 0:
-    print(f'Area: {area}')
-    print(f'Inserted particles: {insertions_made}')
-    print(f'Deposited energy per nm^2: {insertions_made*energy/area}')
-    print(f'Flux: {insertions_made/sputter_time/area}')
+    print(f'Area (nm^2): {area}')
+    print(f'Inserted particles: {inserted_particles}')
+    print(f'Deposited energy per nm^2: {inserted_particles*energy/area}')
+    print(f'Flux: {inserted_particles/sputter_time/area}')
 
 MPI.Finalize()
