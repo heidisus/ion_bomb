@@ -8,8 +8,9 @@ Params:
     flux: particle flux in particles/ps/nm^2
     energy: incidence energy of the sputtered atoms in eV
     filename: name of the LAMMPS input file
+    dumpfile: name of the dump file to write the data to
 Usage:
-    mpirun -np nprocs python3 run_crater_adt.py temperature radius runtime flux energy filename
+    mpirun -np nprocs python3 run_crater_adt.py temperature radius runtime flux energy filename dumpfile
 """
 
 from lammps import lammps
@@ -27,10 +28,12 @@ runtime = float(sys.argv[3])        # total runtime in ps
 flux = float(sys.argv[4])           # particle flux in particles/ps/nm^2
 energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in eV
 input_file = sys.argv[6]            # name of the input file
+dump_file = sys.argv[7]             # name of the dump file to write the data to
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
 lmp.command(f'variable flux equal {flux}')
+lmp.command(f'variable dmpf string {dump_file}')
 
 lmp.file(input_file)  # Input script must not have a run command, as the run is controlled through this python script
 rank = MPI.COMM_WORLD.Get_rank()

@@ -10,8 +10,9 @@ Params:
     wave_period: time between waves in ps
     wave_particles: number of particles in each wave
     filename: name of the LAMMPS input file
+    dumpfile: name of the dump file to write the data to
 Usage:
-    mpirun -np nprocs python3 run_wave.py temperature radius runtime flux energy wave_period wave_particles filename
+    mpirun -np nprocs python3 run_wave.py temperature radius runtime flux energy wave_period wave_particles filename dumpfile
 """
 
 from lammps import lammps
@@ -31,10 +32,13 @@ energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in
 wave_period = float(sys.argv[6])    # time between waves in ps
 wave_particles = int(sys.argv[7])   # number of particles in each wave
 input_file = sys.argv[8]            # name of the input file
+dump_file = sys.argv[9]             # name of the dump file to write the data to
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
 lmp.command(f'variable flux equal {flux}')
+lmp.command(f'variable dmpf string {dump_file}')
+
 
 lmp.file(input_file)  # Input script must not have a run command, as the run is controlled through this python script
 rank = MPI.COMM_WORLD.Get_rank()
