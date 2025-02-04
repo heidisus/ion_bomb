@@ -17,8 +17,7 @@ pythonscripts:
         Contains helper-programs for analysing the output, generating input data, testing etc.
     
     lammps_functions:
-        Contains python functions, which a LAMMPS simulation can call using fix python or other such command. These files are designed to be called from LAMMPS
-        rather than running LAMMPS.
+        Contains python functions, which a LAMMPS simulation can call using fix python or other such command. These files are designed to be called from LAMMPS rather than running LAMMPS.
 
     sim_runners:
         Contains python-scripts that run LAMMPS from python using the LAMMPS module. 
@@ -37,9 +36,3 @@ lammps:
     
     relaxation_scripts:
         Contains LAMMPS input scripts to relax the metal surface.
-
-energy_dist:
-    Contains the figure of the energy distribution from ArcPIC, digitized csv data of the distribution curve, and a python script sampling the distribution.
-
-
-As of 30.01.25 most paths to different files are incorrect, as the architecture was changed significantly.
