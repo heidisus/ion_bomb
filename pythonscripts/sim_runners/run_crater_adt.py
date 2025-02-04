@@ -9,7 +9,7 @@ Params:
     energy: incidence energy of the sputtered atoms in eV
     filename: name of the LAMMPS input file
 Usage:
-    mpirun -np nprocs run_crater_adt.py temperature radius runtime flux energy filename
+    mpirun -np nprocs python3 run_crater_adt.py temperature radius runtime flux energy filename
 """
 
 from lammps import lammps
