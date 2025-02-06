@@ -9,8 +9,9 @@ Params:
     drop_period: time between droplets in ps
     drop_radius: radius of the droplet in Å
     filename: name of the LAMMPS input file
+    dumpfile: name of the dump file to write the data to
 Usage:
-    mpirun -np nprocs python3 run_droplet.py temperature radius runtime flux energy drop_period drop_radius filename
+    mpirun -np nprocs python3 run_droplet.py temperature radius runtime flux energy drop_period drop_radius filename dumpfile
 """
 
 from lammps import lammps
@@ -30,10 +31,12 @@ energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in
 drop_period = float(sys.argv[6])    # time between droplets in ps
 drop_radius = float(sys.argv[7])    # radius of the droplet in Å
 input_file = sys.argv[8]            # name of the input file
+dump_file = sys.argv[9]             # name of the dump file to write the data to
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
 lmp.command(f'variable flux equal {flux}')
+lmp.command(f'variable dmpf string {dump_file}')
 
 lmp.file(input_file)  # Input script must not have a run command, as the run is controlled through this python script
 rank = MPI.COMM_WORLD.Get_rank()
@@ -110,6 +113,7 @@ def insert_particles(n):
         drop_y = rng.integers(-radius, radius)
         drop_z = 50.0
         lmp.commands_list([f'region droplet sphere {drop_x} {drop_y} {drop_z} {drop_radius} units box',
+                           f'lattice fcc 3.615',
                            f'create_atoms 1 region droplet',
                            f'group droplet region droplet',
                            f'velocity droplet set 0 0 {vz} units box'])  # TODO: Relax the droplet before dropping it?
