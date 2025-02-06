@@ -115,14 +115,18 @@ def insert_particles(n):
         lmp.commands_list([f'region droplet sphere {drop_x} {drop_y} {drop_z} {drop_radius} units box',
                            f'lattice fcc 3.615',
                            f'create_atoms 1 region droplet',
-                           f'group droplet region droplet',
-                           f'velocity droplet set 0 0 {vz} units box'])  # TODO: Relax the droplet before dropping it?
+                           f'group droplet region droplet']) # TODO: Relax the droplet before dropping it?
+        
         # On the first droplet, check how many particles are in the droplet
         if drop_particles == 0:
             lmp.command(f'compute dropletcount droplet count/type atom')
             compute_res = lmp.extract_compute('dropletcount', 0, 1)
             drop_particles = int(compute_res[0])
             lmp.command(f'uncompute dropletcount')
+
+        # Set the velocity of the droplet
+        v_drop = np.sqrt(energy*2.0/(63.55*drop_particles))*98.2269
+        lmp.command(f'velocity droplet set 0 0 {v_drop} units box')
 
         # Remove the group and region so a new droplet can be created
         lmp.command(f'region droplet delete')
