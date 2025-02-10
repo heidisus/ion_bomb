@@ -8,10 +8,12 @@ Params:
     energy: incidence energy of the sputtered atoms in eV
     drop_period: time between droplets in ps
     drop_radius: radius of the droplet in Å
+    drop_relax: relaxation time of the droplet in ps
+    drop_temp: temperature of the droplet in K
     filename: name of the LAMMPS input file
     dumpfile: name of the dump file to write the data to
 Usage:
-    mpirun -np nprocs python3 run_droplet.py temperature radius runtime flux energy drop_period drop_radius filename dumpfile
+    mpirun -np nprocs python3 run_droplet.py temperature radius runtime flux energy drop_period drop_radius drop_relax drop_temp filename dumpfile
 """
 
 from lammps import lammps
@@ -30,8 +32,10 @@ flux = float(sys.argv[4])           # particle flux in particles/ps/nm^2
 energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in eV
 drop_period = float(sys.argv[6])    # time between droplets in ps
 drop_radius = float(sys.argv[7])    # radius of the droplet in Å
-input_file = sys.argv[8]            # name of the input file
-dump_file = sys.argv[9]             # name of the dump file to write the data to
+drop_relax = float(sys.argv[8])     # relaxation time of the droplet in ps
+drop_temp = float(sys.argv[9])      # temperature of the droplet in K
+input_file = sys.argv[10]           # name of the input file
+dump_file = sys.argv[11]            # name of the dump file to write the data to
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
@@ -71,8 +75,8 @@ while current_time < sputter_time:
         # Inesrt the droplet at 0.01 ps
         insert_times.append((0.01, 2))
         drop_insertion = drops * drop_period + insert_times[0][0]
-        # Change current time to be after the relaxation time (1 ps)
-        current_time = 1.0
+        # Change current time to be after the relaxation time
+        current_time = drop_relax
     else:
         insert_times.append((current_time, 1))
 
@@ -115,7 +119,6 @@ def insert_particles(n):
         drop_x = rng.integers(-radius, radius)
         drop_y = rng.integers(-radius, radius)
         drop_z = 50.0
-        drop_T = 1400
         lmp.commands_list([f'region droplet sphere {drop_x} {drop_y} {drop_z} {drop_radius} units box',
                            f'lattice fcc 3.615',
                            f'create_atoms 1 region droplet',
@@ -129,7 +132,7 @@ def insert_particles(n):
             lmp.command(f'uncompute dropletcount')
 
         # Relax until 1 ps, then drop the droplet
-        lmp.command(f'velocity droplet create {drop_T} 580252079 dist gaussian')
+        lmp.command(f'velocity droplet create {drop_temp} 580252079 dist gaussian')
         lmp.command(f'fix myhalt all halt 1 v_timee >= {1.0} error continue')
         # Set the velocity of the droplet
         v_drop = np.sqrt(energy*2.0/(63.55*drop_particles))*98.2269
