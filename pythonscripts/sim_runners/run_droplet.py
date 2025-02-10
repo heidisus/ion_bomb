@@ -68,8 +68,11 @@ while current_time < sputter_time:
 
     if current_time >= drop_insertion:
         drops += 1
-        insert_times.append((current_time, 2))
+        # Inesrt the droplet at 0.01 ps
+        insert_times.append((0.01, 2))
         drop_insertion = drops * drop_period + insert_times[0][0]
+        # Change current time to be after the relaxation time (1 ps)
+        current_time = 1.0
     else:
         insert_times.append((current_time, 1))
 
@@ -112,10 +115,11 @@ def insert_particles(n):
         drop_x = rng.integers(-radius, radius)
         drop_y = rng.integers(-radius, radius)
         drop_z = 50.0
+        drop_T = 1400
         lmp.commands_list([f'region droplet sphere {drop_x} {drop_y} {drop_z} {drop_radius} units box',
                            f'lattice fcc 3.615',
                            f'create_atoms 1 region droplet',
-                           f'group droplet region droplet']) # TODO: Relax the droplet before dropping it?
+                           f'group droplet region droplet'])
         
         # On the first droplet, check how many particles are in the droplet
         if drop_particles == 0:
@@ -124,9 +128,13 @@ def insert_particles(n):
             drop_particles = int(compute_res[0])
             lmp.command(f'uncompute dropletcount')
 
+        # Relax until 1 ps, then drop the droplet
+        lmp.command(f'velocity droplet create {drop_T} 580252079 dist gaussian')
+        lmp.command(f'fix myhalt all halt 1 v_timee >= {1.0} error continue')
         # Set the velocity of the droplet
         v_drop = np.sqrt(energy*2.0/(63.55*drop_particles))*98.2269
         lmp.command(f'velocity droplet set 0 0 {v_drop} units box')
+        print(f'Droplet velocity: {v_drop}, ion velocity: {v}')  # Check to make sure the droplet is slower than the ions
 
         # Remove the group and region so a new droplet can be created
         lmp.command(f'region droplet delete')
