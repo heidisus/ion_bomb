@@ -109,8 +109,8 @@ def insert_particles(n):
             # No atoms have left - the new atom's atom_id is new_natoms
             lmp.command(f'group newatom id {new_atom_id}')
 
-        lmp.commands_list([f'velocity newatom set {vx} {vy} {vz}',      # Give the atom a downwards speed
-                            f'group newatom delete'])                   # Delete the group
+        lmp.commands_list([f'velocity newatom set {vx} {vy} {vz} units box',        # Give the atom a downwards speed
+                            f'group newatom delete'])                               # Delete the group
         
         inserted_particles += 1
 
