@@ -9,10 +9,11 @@ Params:
     energy: incidence energy of the sputtered atoms in eV
     wave_period: time between waves in ps
     wave_particles: number of particles in each wave
+    wave_radius: radius of the region to create wave ions in in Å
     filename: name of the LAMMPS input file
-    dumpfile: name of the dump file to write the data to
+    dumpfile: name of the dumpfile
 Usage:
-    mpirun -np nprocs python3 run_wave.py temperature radius runtime flux energy wave_period wave_particles filename dumpfile
+    mpirun -np nprocs python3 run_wave.py temperature radius runtime flux energy wave_period wave_particles wave_radius filename dumpfile
 """
 
 from lammps import lammps
@@ -31,14 +32,15 @@ flux = float(sys.argv[4])           # particle flux in particles/ps/nm^2
 energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in eV
 wave_period = float(sys.argv[6])    # time between waves in ps
 wave_particles = int(sys.argv[7])   # number of particles in each wave
-input_file = sys.argv[8]            # name of the input file
-dump_file = sys.argv[9]             # name of the dump file to write the data to
+wave_radius = float(sys.argv[8])    # radius of region to create wave in
+input_file = sys.argv[9]            # name of the input file
+dump_file = sys.argv[10]
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
 lmp.command(f'variable flux equal {flux}')
 lmp.command(f'variable dmpf string {dump_file}')
-
+lmp.command(f'variable rwave equal {wave_radius}')  # If we later want to use the full r for all uses, just remove this and use r <<<<<
 
 lmp.file(input_file)  # Input script must not have a run command, as the run is controlled through this python script
 rank = MPI.COMM_WORLD.Get_rank()
@@ -59,8 +61,10 @@ vx = 0   # x-component of the velocity
 vy = 0   # y-component of the velocity
 vz = -v  # z-component of the velocity
 
-# Sample the arrival times of the sputtered atoms as a Poisson process 
+# Create the region for the wave
+lmp.command('region wave cylinder z 0.0 0.0 ${rwave} ${cyl_bot} ${cyl_top}')
 
+# Sample the arrival times of the sputtered atoms as a Poisson process 
 current_time = 0
 insert_times = []
 waves = 0
@@ -90,16 +94,23 @@ next_insertion = insert_times[insertions_made][0]
 def insert_particles(n):
     global insertions_made, inserted_particles
 
+    # Check where the particles should be created
+    if n == 1:
+        region = 'sputter'
+    else:
+        region = 'wave'
+
+    # Perform the insertion
     for i in range(n):
-        # Perform the insertion
         natoms = lmp.get_natoms()
         lmp.commands_list([f'reset_atoms id',  # Ensures that the correct atom is added to the group
-                           f'create_atoms 1 random 1 {rng.integers(1000000, 2**31-1)} sputter overlap 1'])  # Create a new atom to be sputtered
+                           f'create_atoms 1 random 1 {rng.integers(1000000, 2**31-1)} {region} overlap 1'])  # Create a new atom to be sputtered
 
         # Check if any atoms leave the box within the same timestep
         new_natoms = lmp.get_natoms()
         new_atom_id = new_natoms
         
+        # TODO: Check if this if-else can be taken away and just use new_natoms?
         if new_natoms == natoms:
             # An atom has just left - the new atom's atom_id is natoms
             lmp.command(f'group newatom id {natoms}')
