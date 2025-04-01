@@ -45,7 +45,7 @@ rng = np.random.default_rng(seed=rng_seed)
 
 # TODO: Write a different method of having a cooldown after the sputtering ends. Current version is not ideal, and somewhat confusing.
 area = np.pi*(radius/10)**2  # area of the sputtered area in nm^2
-sputter_time = runtime*0.75  # time in ps during which the sputtering occurs
+sputter_time = runtime       # time in ps during which the sputtering occurs
 flux_area = flux*area        # flux per nm^2 in particles/ps
 nsteps = int(runtime*10000)  # this argument is passed to the run command as it requires a parameter, however, the actual number of steps taken is controlled by the halt command and the insertion times to use an adaptive timestep but also determine the total simulation time needed, rather than steps. 
 
@@ -94,6 +94,8 @@ while particles_inserted != n_sputtered:
     else:
         # No atoms have left - the new atom's atom_id is new_natoms
         lmp.command(f'group newatom id {new_atom_id}')
+
+    lmp.command(f'group newatom id {new_atom_id}')
 
     particles_inserted += 1
     lmp.commands_list([f'velocity newatom set {vx} {vy} {vz}',      # Give the atom a downwards speed
