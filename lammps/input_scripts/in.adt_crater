@@ -62,5 +62,5 @@ thermo 150
 # dump dmp all custom 500 /scratch/djurabek/heilait/crater_$T_${flux}.dump id type xs ys zs
 #dump dmp all custom 200 /scratch/djurabek/heilait/ionshower_$T_${flux}.dump id type xs ys zs vx vy vz
 # dump dmp all custom 30 lammps/data/wavetest_$T.dump id type xs ys zs
-dump dmp all custom 30 ${dmpf} id type xs ys zs
+dump dmp all custom 1 ${dmpf} id type xs ys zs
 

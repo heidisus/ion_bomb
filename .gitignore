@@ -6,3 +6,5 @@ output/
 energy_dist/
 timer.py
 *.dump
+clock.py
+tables/

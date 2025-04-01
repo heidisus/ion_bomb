@@ -1,0 +1,43 @@
+units metal
+dimension 3 
+boundary p p f
+atom_style atomic 
+
+atom_modify map yes
+
+# Input script for the sputtering simulations, already relaxed at npt and nvt
+# Requires variables T (Initial temperature), r (radius of sputtered area in Å)
+
+region box block -100 100 -100 100 -100 100
+create_box 1 box
+
+
+variable T equal 1000
+
+# Set pair style
+pair_style eam/alloy 
+pair_coeff * * lammps/Cu_mishin1.eam.alloy Cu
+
+# Set lattice constant
+lattice fcc 3.615
+
+region drop sphere 0 0 0 40 units box
+create_atoms 1 region drop
+group drop region drop
+
+compute dropletcount drop count/type atom
+# variable v equal sqrt(100*2.0/(63.55))*98.2269    # 100 eV incidence energy c_dropletcount[1] is the number of atoms in the droplet
+
+# Set velocities for groups
+velocity all create $T 908476724 dist gaussian
+
+thermo_style custom step time temp pe etotal press vol atoms c_dropletcount[1]
+thermo_modify lost ignore flush yes  # Allow atoms to leave the box
+thermo 150
+
+# dump_modify every/time allows to dump once t time has passed
+# dump dmp all custom 500 /scratch/djurabek/heilait/crater_$T_${flux}.dump id type xs ys zs
+#dump dmp all custom 200 /scratch/djurabek/heilait/ionshower_$T_${flux}.dump id type xs ys zs vx vy vz
+dump dmp all custom 30 lammps/data/droptest_$T.dump id type xs ys zs
+
+run 100
