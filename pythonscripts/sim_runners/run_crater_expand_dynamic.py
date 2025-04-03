@@ -8,6 +8,7 @@ Params:
     flux: particle flux in particles/ps/nm^2
     energy: incidence energy of the sputtered atoms in eV
     r_incr: crater increment distance in Å
+    particle_threshold: number of particles in the region before it is expanded
     filename: name of the input file
     dump_file: name of the dump file
 Usage:
@@ -50,8 +51,8 @@ zhi = box_dims[1][2]
 cyl_bot = zhi - 15
 cyl_top = zhi - 5
 
-top = zhi - 50 + 1  # Top of the surface + 1 Å to not count the surface atoms
-checkh = top + 5
+top = zhi - 50 + 3  # Top of the surface + 1a to not count the surface atoms
+checkh = top + 10
 check_xlo = radius + 5
 check_xhi = radius + 15
 
@@ -86,6 +87,8 @@ current_step = 0
 particles_inserted = 0
 current_time = 0
 next_insertion = rng.exponential(scale=1/flux_area)
+
+fluxes = []  # Fluxes as [time, particles, area]
 
 lmp.command('compute rimcount check count/type atom')
 
@@ -123,6 +126,7 @@ while next_insertion < sputter_time:
     check_particles = int(compute_res[0])
 
     if check_particles > particle_threshold:
+        fluxes.append([next_insertion, particles_inserted, area])  # Save the flux for the previous area
         # Check that the radius is not larger than the box - if so remove possibility of further expansion
         if radius + r_incr > xhi:
             print('WARNING: Sputtering region is larger than the box')
@@ -160,8 +164,22 @@ lmp.command(f'run {nsteps}')
 if rank == 0:
     print(f'Final area: {area}')
     print(f'Inserted particles: {particles_inserted}')
-    print(f'Flux: {particles_inserted/sputter_time/area}')
+    print(f'Fluxes:')
+    avg_flux = []
+    print(f'Fluxes: {fluxes}')
+    for i in range(len(fluxes)):
+        if i == 0:
+            prev = [0, 0, 0]
+        else:
+            prev = fluxes[i-1]
+        current = fluxes[i]
 
+        t = current[0] - prev[0]
+        p = current[1] - prev[1]
+        a = current[2]
+        print(f'Flux {i}: {p/t/a}')
+        avg_flux.append(p/t/a)
+    print(f'Average flux: {np.mean(avg_flux)}')
 
 lmp.command(f'write_data {dump_file[:-5]}.data')
 lmp.command(f'write_restart {dump_file[:-5]}_restart')
