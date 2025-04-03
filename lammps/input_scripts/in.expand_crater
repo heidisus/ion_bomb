@@ -1,0 +1,68 @@
+units metal
+dimension 3 
+boundary p p f
+atom_style atomic 
+
+# Input script for the sputtering simulations, already relaxed at npt and nvt
+# Requires variables T (Initial temperature), r (radius of sputtered area in Å)
+
+read_data lammps/data/data.Cu_40x40x10_${T}_nvt_relax
+# read_data /projappl/djurabek/heilait/surfaces/data.Cu_194x194x55_${T}_nvt_relax
+reset_atoms id
+
+# Set pair style
+pair_style eam/alloy 
+pair_coeff * * lammps/Cu_mishin1.eam.alloy Cu
+
+# Box coordinates
+variable xlo equal xlo
+variable xhi equal xhi
+variable ylo equal ylo
+variable yhi equal yhi
+variable zlo equal zlo
+variable zhi equal zhi
+# variable top equal (${zhi}-250)
+
+variable top equal (${zhi}-50)  # top of the surface
+variable bot equal (${zlo}+50)  # bottom of the surface
+variable surf_bot equal (${top}-10)  # bottom of the surface layer
+variable frozen_coord equal (${bot}+10)  # freeze atoms up to this height
+
+variable area equal ((v_xhi-v_xlo)*(v_yhi-v_ylo)/100)   # Surface area in nm^2
+
+# Set regions and groups
+region bottom block INF INF INF INF INF ${frozen_coord}			            # Region where momentum is zeroed
+region surface block INF INF INF INF ${surf_bot} ${top}                     # Region where the temperature is calculated
+region crater cylinder z 0.0 0.0 ${r} ${surf_bot} ${top} units box
+region tcalc block INF INF INF INF ${bot} ${top} units box 
+
+group bottom region bottom 
+group surface region surface 
+group crater dynamic all region crater every 25
+group tcalc dynamic all region tcalc every 50
+
+variable inserted_atoms equal 0
+compute tcrater crater temp
+compute tbox tcalc temp 
+
+variable timee equal time      # Monitor time through variable
+
+# Set velocities for groups
+velocity all create $T 908476724 dist gaussian
+velocity bottom set 0 0 0
+
+timestep 0.002
+# Set system to nve, set the bottom momentum to 0
+fix 1 all nve
+fix 2 bottom momentum 1 linear 1 1 1 angular
+# fix adt all dt/reset 10 NULL NULL 0.1 emax 150 units box  # Set an adaptive timestep
+
+thermo_style custom step time temp pe etotal press vol atoms c_tbox v_inserted_atoms
+thermo_modify lost ignore flush yes  # Allow atoms to leave the box
+thermo 100
+
+# dump dmp all custom 50 ${dmpf} id type xs ys zs
+dump dmp all custom 50 ${dmpf} id type xs ys zs #vx vy vz
+# dump_modify dmp every/time 10
+# dump dmp all custom 5000 ${dmpf} id type xs ys zs vx vy vz
+
