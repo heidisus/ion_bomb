@@ -7,9 +7,12 @@ Params:
     runtime: total runtime in ps
     flux: particle flux in particles/ps/nm^2
     energy: incidence energy of the sputtered atoms in eV
+    incr_t: crater increment time in ps
+    incr_d: crater increment distance in Å
     filename: name of the input file
+    dump_file: name of the dump file
 Usage:
-    mpirun -np nprocs run_crater_expand.py temperature radius runtime flux energy filename
+    mpirun -np nprocs run_crater_expand.py temperature radius runtime flux energy incr_t incr_d filename dump_file
 """
 
 from lammps import lammps
