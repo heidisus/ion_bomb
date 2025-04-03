@@ -31,6 +31,7 @@ flux = float(sys.argv[4])           # particle flux in particles/ps/nm^2
 energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in eV
 incr_t = float(sys.argv[6])         # crater increment time in ps
 incr_d = float(sys.argv[7])         # crater increment distance in Å
+incr_buffer = float(sys.argv[8])    # time buffer before the first increase
 input_file = sys.argv[8]            # name of the input file
 dump_file = sys.argv[9]             # name of the dump file
 
@@ -69,11 +70,19 @@ nsteps = int(runtime*10000)  # this argument is passed to the run command as it 
 current_time = 0
 insert_times = []
 
-# TODO: Figure out whether N of ions stays consistent or grows with the sputtered area
+next_increase = incr_buffer
+
 while current_time < sputter_time:
     arrival_time = rng.exponential(scale=1/flux_area)
     current_time += arrival_time
     insert_times.append(current_time)
+
+    # Dynamic flux - increase the radius of the sputtering region
+    if current_time >= next_increase:
+        radius = radius + incr_d
+        area = np.pi*(radius/10)**2
+        flux_area = flux*area
+        next_increase += incr_t
 
 n_sputtered = len(insert_times)  # number of sputtered atoms
 
@@ -89,7 +98,7 @@ current_step = 0
 particles_inserted = 0
 current_time = 0
 next_insertion = insert_times[particles_inserted]
-
+next_increase = incr_buffer
 
 while particles_inserted != n_sputtered:
     # Set the insertion time
@@ -122,11 +131,11 @@ while particles_inserted != n_sputtered:
                        f'variable inserted_atoms equal {particles_inserted}'])
     
     # Create a new region with the new radius (next_insertion == current time)
-    if next_insertion > incr_t:
+    if next_insertion > next_increase:
         radius += incr_d
         lmp.commands_list(['region sputter delete',
                         f'region sputter cylinder z 0.0 0.0 {radius} {cyl_bot} {cyl_top} units box'])
-        incr_t += incr_t
+        next_increase += incr_t
     
 
 # Once all particles have been added, run until the end
