@@ -23,16 +23,15 @@ import sys
 lmp = lammps(cmdargs=["-sf", "opt"])
 
 # Set initial run parameters
-temperature = float(sys.argv[1])    # temperature of the of the surface in K
-radius = int(sys.argv[2])           # initial radius of the showered area in Å
-runtime = float(sys.argv[3])        # total runtime in ps
-flux = float(sys.argv[4])           # particle flux in particles/ps/nm^2
-energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in eV
-r_incr = float(sys.argv[6])         # crater radius increase in Å
-input_file = sys.argv[7]            # name of the input file
-dump_file = sys.argv[8]             # name of the dump file
-
-particle_threshold = 10  # Number of particles in the region before it is expanded
+temperature = float(sys.argv[1])        # temperature of the of the surface in K
+radius = int(sys.argv[2])               # initial radius of the showered area in Å
+runtime = float(sys.argv[3])            # total runtime in ps
+flux = float(sys.argv[4])               # particle flux in particles/ps/nm^2
+energy = float(sys.argv[5])	            # incidence energy of the sputtered atoms in eV
+r_incr = float(sys.argv[6])             # crater radius increase in Å
+particle_threshold = int(sys.argv[7])   # number of particles in the region before it is expanded
+input_file = sys.argv[8]                # name of the input file
+dump_file = sys.argv[9]                 # name of the dump file
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
@@ -48,7 +47,7 @@ zhi = box_dims[1][2]
 cyl_bot = zhi - 15
 cyl_top = zhi - 5
 
-top = zhi - 50 + 1  # Top of the surface + 1 to not count the surface atoms
+top = zhi - 50 + 1  # Top of the surface + 1 Å to not count the surface atoms
 checkh = top + 5
 check_xlo = radius + 5
 check_xhi = radius + 15
