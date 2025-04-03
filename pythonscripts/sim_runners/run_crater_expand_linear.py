@@ -71,6 +71,7 @@ current_time = 0
 insert_times = []
 
 next_increase = incr_buffer
+radius_init = radius
 
 while current_time < sputter_time:
     arrival_time = rng.exponential(scale=1/flux_area)
@@ -99,6 +100,7 @@ particles_inserted = 0
 current_time = 0
 next_insertion = insert_times[particles_inserted]
 next_increase = incr_buffer
+radius = radius_init
 
 while particles_inserted != n_sputtered:
     # Set the insertion time
