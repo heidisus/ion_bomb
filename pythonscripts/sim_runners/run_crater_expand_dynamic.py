@@ -42,6 +42,9 @@ lmp.file(input_file)  # Input script must not have a run command, as the run is 
 
 # Set the height of the sputtering region
 box_dims = lmp.extract_box()  # Box dims in ([xlo, ylo, zlo], [xhi, yhi, zhi], xy, yz, xz)
+xhi = box_dims[1][0]  # xhi
+yhi = box_dims[1][1]  # yhi
+
 zlo = box_dims[0][2] 
 zhi = box_dims[1][2]  
 cyl_bot = zhi - 15
@@ -71,18 +74,6 @@ sputter_time = runtime   # time in ps during which the sputtering occurs
 flux_area = flux*area    # flux per nm^2 in particles/ps
 nsteps = int(runtime*10000)  # this argument is passed to the run command as it requires a parameter, however, the actual number of steps taken is controlled by the halt command and the insertion times
 
-# Sample the arrival times of the sputtered atoms as a Poisson process
-current_time = 0
-insert_times = []
-
-# TODO: Figure out whether N of ions stays consistent or grows with the sputtered area
-while current_time < sputter_time:
-    arrival_time = rng.exponential(scale=1/flux_area)
-    current_time += arrival_time
-    insert_times.append(current_time)
-
-n_sputtered = len(insert_times)  # number of sputtered atoms
-
 v = np.sqrt(energy*2.0/63.55)*98.2269  # Total velocity of the sputtered atoms based on the incidence energy, 98 factor from scipy.constants
 vx = 0   # x-component of the velocity
 vy = 0   # y-component of the velocity
@@ -94,13 +85,12 @@ comm = MPI.COMM_WORLD
 current_step = 0
 particles_inserted = 0
 current_time = 0
-next_insertion = insert_times[particles_inserted]
+next_insertion = rng.exponential(scale=1/flux_area)
 
 lmp.command('compute rimcount check count/type atom')
 
-while particles_inserted != n_sputtered:
+while next_insertion < sputter_time:
     # Set the insertion time
-    next_insertion = insert_times[particles_inserted]
     lmp.command(f'fix myhalt all halt 1 v_timee >= {next_insertion} error continue')
 
     # Run until we reach the next insertion, the simulation will run until the next insertion point is reached
@@ -133,6 +123,12 @@ while particles_inserted != n_sputtered:
     check_particles = int(compute_res[0])
 
     if check_particles > particle_threshold:
+        # Check that the radius is not larger than the box - if so remove possibility of further expansion
+        if radius + r_incr > xhi:
+            print('WARNING: Sputtering region is larger than the box')
+            r_incr = 0
+            particle_threshold = natoms
+
         radius += r_incr
         lmp.commands_list(['region sputter delete',
                         f'region sputter cylinder z 0.0 0.0 {radius} {cyl_bot} {cyl_top} units box'])
@@ -147,9 +143,12 @@ while particles_inserted != n_sputtered:
                            f'region check block {check_xlo} {check_xhi} INF INF {top} {checkh} units box',
                            'group check dynamic all region check every 50',
                            'compute rimcount check count/type atom'])
+        area = np.pi*(radius/10)**2
+        flux_area = flux*area
         
-        # TODO: Generate particles for the new ring here if using dynamic flux, and add to the insert_times list?
-
+    # Calculate the next insertion time    
+    arrival_time = rng.exponential(scale=1/flux_area)
+    next_insertion += arrival_time
     
 
 # Once all particles have been added, run until the end
@@ -159,9 +158,8 @@ lmp.command(f'run {nsteps}')
 
 # TODO: Determine the area of the sputtered region / the flux
 if rank == 0:
-    print(f'Area: {area}')
+    print(f'Final area: {area}')
     print(f'Inserted particles: {particles_inserted}')
-    print(f'Deposited energy per nm^2: {particles_inserted*energy/area}')
     print(f'Flux: {particles_inserted/sputter_time/area}')
 
 
