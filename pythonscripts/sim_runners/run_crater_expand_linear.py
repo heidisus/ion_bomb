@@ -12,7 +12,7 @@ Params:
     filename: name of the input file
     dump_file: name of the dump file
 Usage:
-    mpirun -np nprocs run_crater_expand.py temperature radius runtime flux energy incr_t incr_d filename dump_file
+    mpirun -np nprocs run_crater_expand_linear.py temperature radius runtime flux energy incr_t incr_d filename dump_file
 """
 
 from lammps import lammps
@@ -151,8 +151,6 @@ while particles_inserted != n_sputtered:
 lmp.command(f'fix myhalt all halt 100 v_timee >= {runtime} error continue')
 lmp.command(f'run {nsteps}')
 
-
-# TODO: Determine the area of the sputtered region / the flux
 if rank == 0:
     print(f'Final area: {area}')
     print(f'Inserted particles: {particles_inserted}')
