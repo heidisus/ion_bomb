@@ -12,7 +12,7 @@ Params:
     filename: name of the input file
     dump_file: name of the dump file
 Usage:
-    mpirun -np nprocs run_crater_expand.py temperature radius runtime flux energy r_incr filename dump_file
+    mpirun -np nprocs run_crater_expand_dynamic.py temperature radius runtime flux energy r_incr filename dump_file
 """
 
 from lammps import lammps
@@ -32,10 +32,9 @@ energy = float(sys.argv[5])	            # incidence energy of the sputtered atom
 r_incr = float(sys.argv[6])             # crater radius increase in Å
 particle_threshold = int(sys.argv[7])   # number of particles in the region before it is expanded
 flux_decr = float(sys.argv[8])          # decrease in flux per increment
-input_file = sys.argv[9]                # name of the input file
-dump_file = sys.argv[10]                 # name of the dump file
-
-# TODO: Add a value for minimum flux?
+min_flux = float(sys.argv[9])           # minimum flux
+input_file = sys.argv[10]                # name of the input file
+dump_file = sys.argv[11]                 # name of the dump file
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
@@ -151,8 +150,9 @@ while next_insertion < sputter_time:
                            'group check dynamic all region check every 50',
                            'compute rimcount check count/type atom'])
         area = np.pi*(radius/10)**2
-        if flux > flux_decr:
-            flux = flux - flux_decr
+        flux = flux - flux_decr
+        if flux < min_flux:
+            flux = min_flux
         flux_area = flux*area        
         
     # Calculate the next insertion time    
@@ -165,7 +165,7 @@ lmp.command(f'fix myhalt all halt 100 v_timee >= {runtime} error continue')
 lmp.command(f'run {nsteps}')
 
 fluxes.append([next_insertion, particles_inserted, area])
-# TODO: Determine the area of the sputtered region / the flux
+
 if rank == 0:
     print(f'Final area: {area}')
     print(f'Inserted particles: {particles_inserted}')
