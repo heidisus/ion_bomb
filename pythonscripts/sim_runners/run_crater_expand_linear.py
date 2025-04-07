@@ -85,7 +85,8 @@ while current_time < sputter_time:
         fluxes.append([current_time, len(insert_times), area])
         radius = radius + incr_d
         area = np.pi*(radius/10)**2
-        flux = flux - flux_decr
+        if flux > flux_decr:
+            flux = flux - flux_decr
         flux_area = flux*area
         next_increase += incr_t
 
