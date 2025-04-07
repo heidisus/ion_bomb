@@ -32,8 +32,9 @@ energy = float(sys.argv[5])	        # incidence energy of the sputtered atoms in
 incr_t = float(sys.argv[6])         # crater increment time in ps
 incr_d = float(sys.argv[7])         # crater increment distance in Å
 incr_buffer = float(sys.argv[8])    # time buffer before the first increase
-input_file = sys.argv[8]            # name of the input file
-dump_file = sys.argv[9]             # name of the dump file
+flux_decr = float(sys.argv[9])     # decrease in flux per increment
+input_file = sys.argv[10]            # name of the input file
+dump_file = sys.argv[11]            # name of the dump file
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
@@ -69,6 +70,7 @@ nsteps = int(runtime*10000)  # this argument is passed to the run command as it 
 # Sample the arrival times of the sputtered atoms as a Poisson process
 current_time = 0
 insert_times = []
+fluxes = []
 
 next_increase = incr_buffer
 radius_init = radius
@@ -80,10 +82,14 @@ while current_time < sputter_time:
 
     # Dynamic flux - increase the radius of the sputtering region
     if current_time >= next_increase:
+        fluxes.append([current_time, len(insert_times), area])
         radius = radius + incr_d
         area = np.pi*(radius/10)**2
+        flux = flux - flux_decr
         flux_area = flux*area
         next_increase += incr_t
+
+fluxes.append([current_time, len(insert_times), area])
 
 n_sputtered = len(insert_times)  # number of sputtered atoms
 
@@ -147,10 +153,28 @@ lmp.command(f'run {nsteps}')
 
 # TODO: Determine the area of the sputtered region / the flux
 if rank == 0:
-    print(f'Area: {area}')
+    print(f'Final area: {area}')
     print(f'Inserted particles: {particles_inserted}')
-    print(f'Deposited energy per nm^2: {particles_inserted*energy/area}')
-    print(f'Flux: {particles_inserted/sputter_time/area}')
+    print(f'Fluxes:')
+    avg_flux = []
+    print(f'Fluxes: {fluxes}')
+    for i in range(len(fluxes)):
+        if i == 0:
+            prev = [0, 0, 0]
+        else:
+            prev = fluxes[i-1]
+        current = fluxes[i]
+
+        t = current[0] - prev[0]
+        p = current[1] - prev[1]
+        a = current[2]
+        try:
+            print(f'Flux up to {current[0]} ps: {p/t/a}')
+            avg_flux.append(p/t/a)
+        except ZeroDivisionError:
+            print(f'Flux up to {current[0]} ps: 0')
+            avg_flux.append(0)
+    print(f'Average flux: {np.mean(avg_flux)}')
 
 
 lmp.command(f'write_data {dump_file[:-5]}.data')
