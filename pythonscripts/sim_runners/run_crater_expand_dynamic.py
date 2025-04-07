@@ -31,8 +31,11 @@ flux = float(sys.argv[4])               # particle flux in particles/ps/nm^2
 energy = float(sys.argv[5])	            # incidence energy of the sputtered atoms in eV
 r_incr = float(sys.argv[6])             # crater radius increase in Å
 particle_threshold = int(sys.argv[7])   # number of particles in the region before it is expanded
-input_file = sys.argv[8]                # name of the input file
-dump_file = sys.argv[9]                 # name of the dump file
+flux_decr = float(sys.argv[8])          # decrease in flux per increment
+input_file = sys.argv[9]                # name of the input file
+dump_file = sys.argv[10]                 # name of the dump file
+
+# TODO: Add a value for minimum flux?
 
 lmp.command(f'variable r equal {radius}')
 lmp.command(f'variable T equal {temperature}')
@@ -148,7 +151,9 @@ while next_insertion < sputter_time:
                            'group check dynamic all region check every 50',
                            'compute rimcount check count/type atom'])
         area = np.pi*(radius/10)**2
-        flux_area = flux*area
+        if flux > flux_decr:
+            flux = flux - flux_decr
+        flux_area = flux*area        
         
     # Calculate the next insertion time    
     arrival_time = rng.exponential(scale=1/flux_area)
@@ -159,7 +164,7 @@ while next_insertion < sputter_time:
 lmp.command(f'fix myhalt all halt 100 v_timee >= {runtime} error continue')
 lmp.command(f'run {nsteps}')
 
-
+fluxes.append([next_insertion, particles_inserted, area])
 # TODO: Determine the area of the sputtered region / the flux
 if rank == 0:
     print(f'Final area: {area}')
@@ -177,7 +182,7 @@ if rank == 0:
         t = current[0] - prev[0]
         p = current[1] - prev[1]
         a = current[2]
-        print(f'Flux {i}: {p/t/a}')
+        print(f'Flux up to {current[0]} ps: {p/t/a}')
         avg_flux.append(p/t/a)
     print(f'Average flux: {np.mean(avg_flux)}')
 
