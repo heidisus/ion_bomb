@@ -1,17 +1,30 @@
 from ovito.io import import_file
 import scipy.constants as cs
 import numpy as np
+import pandas as pd
+import sys
 
 # Compute the temperature of the edge
 
+try:
+    filename = sys.argv[1]  # Name of the dump file
+    dump_freq = int(sys.argv[2])  # Dump frequency in ps
+    
+except IndexError:
+    print("No filename provided. Using default dump file.")
+    filename = "hotcrater.dump"
+    dump_freq = 5  # Dump frequency in ps
+
+
 # Init pipeline from dump file
 print('Importing dump file...')
-pipeline = import_file("../dumpfiles/olds/hotcrater.dump")
+pipeline = import_file(f"../dumpfiles/olds/{filename}")
 print('Dump file imported')
 
 n_frames = pipeline.num_frames
+temperatures = []  # List of edge temperatures 
 
-# TODO: Add the temperatures into a list and add possibility to plot them
+print(f'Computing temperature for {n_frames} frames...')
 for frame in range(n_frames):
     data = pipeline.compute(frame)  # Compute values at the current frame
 
@@ -21,9 +34,7 @@ for frame in range(n_frames):
     edge_indices = np.where((atom_positions[:, 0] > 340) & (atom_positions[:, 2] < 120))[0]  # Get indices of atoms with x > 340 and z < 120
     edge_velocities = atom_velocities[edge_indices]  # Use indices to get corresponding velocities
 
-    # Calculate the temperature of the edge atoms
-    # Temperature is proportional to the average kinetic energy: KE = 0.5 * m * v^2
-
+    # Calculate the temperature of the edge atoms from average kinetic energy: ke = 1/2 * m*v^2
     boltzmann_constant = cs.Boltzmann  # Boltzmann constant in J/K
     edge_velocities = edge_velocities * 100  # Convert velocities from Å/ps to m/s
     atom_mass = 63.55 * cs.atomic_mass  # Atomic mass of Cu in kg
@@ -33,5 +44,12 @@ for frame in range(n_frames):
 
     # Calculate temperature
     temperature = (2/3) * (kinetic_energy / (len(edge_velocities) * boltzmann_constant))
+    time = frame * dump_freq  # Frame number multiplied by the dump frequency (5 ps)
+    # print(f"Temperature of edge atoms: {temperature} K")
+    temperatures.append((time, temperature))
 
-    print(f"Temperature of edge atoms: {temperature} K")
+# Save the temperatures to a csv file
+print('Saving temperatures to a csv file...')
+df = pd.DataFrame(temperatures, columns=['Temperature (K)', 'Time (ps)'])
+output_file = f"tables/temperatures_{filename[:-5]}.csv"
+df.to_csv(output_file, index=False)
