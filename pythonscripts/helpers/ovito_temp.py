@@ -32,15 +32,18 @@ print('Dump file imported')
 
 n_frames = pipeline.num_frames
 temperatures = []  # List of edge temperatures 
+edge_coordinates = [340, 350, 120]  # List of edge coordinates (x, y, z)
 
 print(f'Computing temperature for {n_frames} frames...')
 for frame in range(n_frames):
     data = pipeline.compute(frame)  # Compute values at the current frame
 
+    # Get positions and velocities of all atoms
     atom_positions = np.array(data.particles.positions)
     atom_velocities = np.array(data.particles['Velocity Magnitude'])
 
-    edge_indices = np.where((atom_positions[:, 0] > 340) & (atom_positions[:, 2] < 120))[0]  # Get indices of atoms with x > 340 and z < 120
+    # Get indices of atoms in the edge region
+    edge_indices = np.where((atom_positions[:, 0] > edge_coordinates[0]) & (atom_positions[:, 2] < edge_coordinates[2]))[0]
     edge_velocities = atom_velocities[edge_indices]  # Use indices to get corresponding velocities
 
     # Calculate the temperature of the edge atoms from average kinetic energy: ke = 1/2 * m*v^2
@@ -53,7 +56,7 @@ for frame in range(n_frames):
 
     # Calculate temperature
     temperature = (2/3) * (kinetic_energy / (len(edge_velocities) * boltzmann_constant))
-    time = frame * dump_freq  # Frame number multiplied by the dump frequency (5 ps)
+    time = frame * dump_freq  # Frame number multiplied by the dump frequency to get time in ps
     # print(f"Temperature of edge atoms: {temperature} K")
     temperatures.append((time, temperature))
 
