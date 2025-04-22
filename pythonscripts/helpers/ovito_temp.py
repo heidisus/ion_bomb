@@ -1,3 +1,11 @@
+"""Script to compute the temperature of the edge of a simulation box from a dump file using OVITO.
+Parameters:
+    filename: name of the dump file"
+    dump_freq: dump frequency in ps
+Usage:
+    python3 ovito_temp.py filename dump_freq
+"""
+
 from ovito.io import import_file
 import scipy.constants as cs
 import numpy as np
@@ -5,20 +13,21 @@ import pandas as pd
 import sys
 
 # Compute the temperature of the edge
+# Input file and its dump frequency can be given from the command line or by changing the default values:
+filename = "hotcrater.dump"
+dump_freq = 5  # Dump frequency in ps
 
 try:
     filename = sys.argv[1]  # Name of the dump file
     dump_freq = int(sys.argv[2])  # Dump frequency in ps
-    
+
 except IndexError:
     print("No filename provided. Using default dump file.")
-    filename = "hotcrater.dump"
-    dump_freq = 5  # Dump frequency in ps
 
 
 # Init pipeline from dump file
 print('Importing dump file...')
-pipeline = import_file(f"../dumpfiles/olds/{filename}")
+pipeline = import_file(f"../dumpfiles/{filename}")
 print('Dump file imported')
 
 n_frames = pipeline.num_frames
@@ -50,6 +59,6 @@ for frame in range(n_frames):
 
 # Save the temperatures to a csv file
 print('Saving temperatures to a csv file...')
-df = pd.DataFrame(temperatures, columns=['Temperature (K)', 'Time (ps)'])
+df = pd.DataFrame(temperatures, columns=['Time (ps)', 'Temperature (K)'])
 output_file = f"tables/temperatures_{filename[:-5]}.csv"
 df.to_csv(output_file, index=False)
