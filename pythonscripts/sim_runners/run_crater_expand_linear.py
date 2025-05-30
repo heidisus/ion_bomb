@@ -12,7 +12,7 @@ Params:
     filename: name of the input file
     dump_file: name of the dump file
 Usage:
-    mpirun -np nprocs run_crater_expand_linear.py temperature radius runtime flux energy incr_t incr_d filename dump_file
+    mpirun -np nprocs run_crater_expand_linear.py temperature radius runtime flux energy incr_t incr_d incr_buffer flux_decr filename dump_file
 """
 
 from lammps import lammps

@@ -5,12 +5,12 @@ atom_style atomic
 
 # NPT relaxation of Cu system to selected temperature
 
-read_data lammps/data/Cu_0K_14x14x8
+read_data lammps/data/Cu_0K_70x70x10
 
 pair_style eam/alloy 
 pair_coeff * * lammps/Cu_mishin1.eam.alloy Cu
 
-variable T equal 1000  # uncomment if the temp is not given from the cmd line
+variable T equal 300  # uncomment if the temp is not given from the cmd line
 velocity all create ${T} 1354657 dist gaussian
 
 timestep 0.001
@@ -22,7 +22,7 @@ thermo 100
 
 run 3000
 
-write_data lammps/data/data.Cu_14x14x8_${T}_npt_relax
+write_data lammps/data/data.Cu_70x70x10_${T}_npt_relax
 
 unfix 1
 
@@ -73,4 +73,4 @@ thermo 100
 
 run 3000
 
-write_data lammps/data/data.Cu_14x14x8_${T}_nvt_relax
+write_data lammps/data/data.Cu_70x70x10_${T}_nvt_relax

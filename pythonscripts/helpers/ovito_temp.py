@@ -31,10 +31,11 @@ pipeline = import_file(f"../dumpfiles/{filename}")
 print('Dump file imported')
 
 n_frames = pipeline.num_frames
-temperatures = []  # List of edge temperatures 
-edge_coordinates = [340, 350, 120]  # List of edge coordinates (x, y, z)
+temperatures = []  # Initialize list of edge temperatures 
+edge_coordinates = [340, 350, 120]  # List of edge coordinates (x, y, z) (y-currently not used)
 
 print(f'Computing temperature for {n_frames} frames...')
+
 for frame in range(n_frames):
     data = pipeline.compute(frame)  # Compute values at the current frame
 

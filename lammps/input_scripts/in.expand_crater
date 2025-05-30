@@ -62,7 +62,7 @@ thermo_modify lost ignore flush yes  # Allow atoms to leave the box
 thermo 100
 
 # dump dmp all custom 50 ${dmpf} id type xs ys zs
-dump dmp all custom 50 ${dmpf} id type xs ys zs #vx vy vz
+dump dmp all custom 200 ${dmpf} id type xs ys zs #vx vy vz
 # dump_modify dmp every/time 10
 # dump dmp all custom 5000 ${dmpf} id type xs ys zs vx vy vz
 

@@ -6,13 +6,17 @@ atom_style atomic
 # Input script for the sputtering simulations, already relaxed at npt and nvt
 # Requires variables T (Initial temperature), r (radius of sputtered area in Å), T2 (temperature to heat the center)
 
-read_data data/data.Cu_194x194x42_${T}_nvt_relax
+# variable T2 equal 1400  # hardcoded to test with the droplet, remove for proper usage
+
+read_data lammps/data/data.Cu_40x40x10_${T}_nvt_relax
+# read_data /projappl/djurabek/heilait/surfaces/data.Cu_194x194x55_${T}_nvt_relax
 reset_atoms id
 
 # Set pair style
-pair_style eam/alloy
-pair_coeff * * Cu_mishin1.eam.alloy Cu
+pair_style eam/alloy 
+pair_coeff * * lammps/Cu_mishin1.eam.alloy Cu
 
+# Box coordinates
 # Box coordinates
 variable xlo equal xlo
 variable xhi equal xhi
@@ -20,22 +24,22 @@ variable ylo equal ylo
 variable yhi equal yhi
 variable zlo equal zlo
 variable zhi equal zhi
+# variable top equal (${zhi}-250)
 
-variable new_zhi equal (${zhi}-100)
-variable cyl_bot equal (${zhi}-115)
-variable cyl_top equal (${zhi}-110)
-variable top equal (${zhi}-250)
-variable bot equal (${zlo}+50)
+variable top equal (${zhi}-50)  # top of the surface
+variable bot equal (${zlo}+50)  # bottom of the surface
+variable surf_bot equal (${top}-10)  # bottom of the surface layer
+variable frozen_coord equal (${bot}+10)  # freeze atoms up to this height
 
-variable surf_bot equal (${top}-20)
-variable frozen_coord equal (${bot}+10)
+variable cyl_bot equal (${zhi}-15)
+variable cyl_top equal (${zhi}-10)
 
 variable dxl equal (${xlo}+10)
 variable dxh equal (${xhi}-10)
 variable dyl equal (${ylo}+10)
 variable dyh equal (${yhi}-10)
 
-change_box all z final ${zlo} ${new_zhi} boundary p p f units box  # remove some extra height added in relaxation
+# change_box all z final ${zlo} ${new_zhi} boundary p p f units box  # remove some extra height added in relaxation
 variable area equal ((v_xhi-v_xlo)*(v_yhi-v_ylo)/100)   # Surface area in nm^2
 
 # Set regions and groups
@@ -49,7 +53,8 @@ group bottom region bottom
 group surface region surface
 group sputter region sputter
 group innerblock region innerblock
-group crater dynamic all region crater every 25
+group crater region crater
+#dynamic all region crater every 25
 
 group hot region crater
 group cold subtract surface innerblock
@@ -69,29 +74,34 @@ timestep 0.001
 
 
 # Heat the center
-fix hotatoms hot nvt temp ${T2} ${T2} $(100*dt)
+fix hotatoms hot nvt temp ${T} ${T2} $(100*dt)
 fix midatoms nveatoms nve
 fix botatoms nveatoms2 nve
-fix coldatoms cold nvt temp ${T} ${T} $(100*dt)
+fix coldatoms cold nve
 fix 2 bottom momentum 1 linear 1 1 1 angular
 
-run 5000
+thermo_style custom step time temp pe etotal press vol atoms c_tcrater v_inserted_atoms
+thermo_modify lost ignore flush yes  # Allow atoms to leave the box
+thermo 50
+
+run 1500
 
 unfix hotatoms
 unfix midatoms
 unfix botatoms
 unfix coldatoms
 
+reset_timestep 0 time 0
+
 # Set system to nve, set the bottom momentum to 0
 fix 1 all nve
-fix adt all dt/reset 10 NULL NULL 0.1 emax 50 units box  # Set an adaptive timestep
+fix adt all dt/reset 10 NULL NULL 0.1 emax 30 units box  # Set an adaptive timestep
 
-thermo_style custom step time temp pe etotal press vol atoms c_tcrater v_inserted_atoms
-thermo_modify lost ignore flush yes  # Allow atoms to leave the box
-thermo 500
 
+dump dmp all custom 50 ${dmpf} id type xs ys zs vx vy vz
+# dump_modify dmp every/time 5
 # dump_modify every/time allows to dump once t time has passed
-dump dmp all custom 100 /scratch/djurabek/heilait/hotcrater.dump id type xs ys zs
-dump_modify dmp every/time 5
+
 # dump dmp all custom 200 /scratch/djurabek/heilait/ionshower_$T_${flux}.dump id type xs ys zs vx vy vz
 # dump dmp all custom 50 adtcratertest_$T.dump id type xs ys zs
+
